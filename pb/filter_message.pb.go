@@ -25,16 +25,19 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-type ListFilter struct {
+type TweetFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Page uint32 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	// Types that are assignable to Filter:
+	//	*TweetFilter_UserId
+	//	*TweetFilter_Page
+	Filter isTweetFilter_Filter `protobuf_oneof:"filter"`
 }
 
-func (x *ListFilter) Reset() {
-	*x = ListFilter{}
+func (x *TweetFilter) Reset() {
+	*x = TweetFilter{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_filter_message_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -42,13 +45,13 @@ func (x *ListFilter) Reset() {
 	}
 }
 
-func (x *ListFilter) String() string {
+func (x *TweetFilter) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListFilter) ProtoMessage() {}
+func (*TweetFilter) ProtoMessage() {}
 
-func (x *ListFilter) ProtoReflect() protoreflect.Message {
+func (x *TweetFilter) ProtoReflect() protoreflect.Message {
 	mi := &file_filter_message_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -60,26 +63,59 @@ func (x *ListFilter) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListFilter.ProtoReflect.Descriptor instead.
-func (*ListFilter) Descriptor() ([]byte, []int) {
+// Deprecated: Use TweetFilter.ProtoReflect.Descriptor instead.
+func (*TweetFilter) Descriptor() ([]byte, []int) {
 	return file_filter_message_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ListFilter) GetPage() uint32 {
-	if x != nil {
+func (m *TweetFilter) GetFilter() isTweetFilter_Filter {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (x *TweetFilter) GetUserId() string {
+	if x, ok := x.GetFilter().(*TweetFilter_UserId); ok {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *TweetFilter) GetPage() uint32 {
+	if x, ok := x.GetFilter().(*TweetFilter_Page); ok {
 		return x.Page
 	}
 	return 0
 }
 
+type isTweetFilter_Filter interface {
+	isTweetFilter_Filter()
+}
+
+type TweetFilter_UserId struct {
+	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3,oneof"`
+}
+
+type TweetFilter_Page struct {
+	Page uint32 `protobuf:"varint,2,opt,name=page,proto3,oneof"`
+}
+
+func (*TweetFilter_UserId) isTweetFilter_Filter() {}
+
+func (*TweetFilter_Page) isTweetFilter_Filter() {}
+
 var File_filter_message_proto protoreflect.FileDescriptor
 
 var file_filter_message_proto_rawDesc = []byte{
 	0x0a, 0x14, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x02, 0x76, 0x31, 0x22, 0x20, 0x0a, 0x0a, 0x4c, 0x69,
-	0x73, 0x74, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x42, 0x06, 0x5a, 0x04,
-	0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x02, 0x76, 0x31, 0x22, 0x48, 0x0a, 0x0b, 0x54, 0x77,
+	0x65, 0x65, 0x74, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x19, 0x0a, 0x07, 0x75, 0x73, 0x65,
+	0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x06, 0x75, 0x73,
+	0x65, 0x72, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0d, 0x48, 0x00, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x42, 0x08, 0x0a, 0x06, 0x66, 0x69,
+	0x6c, 0x74, 0x65, 0x72, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -96,7 +132,7 @@ func file_filter_message_proto_rawDescGZIP() []byte {
 
 var file_filter_message_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_filter_message_proto_goTypes = []interface{}{
-	(*ListFilter)(nil), // 0: v1.ListFilter
+	(*TweetFilter)(nil), // 0: v1.TweetFilter
 }
 var file_filter_message_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -113,7 +149,7 @@ func file_filter_message_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_filter_message_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListFilter); i {
+			switch v := v.(*TweetFilter); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -124,6 +160,10 @@ func file_filter_message_proto_init() {
 				return nil
 			}
 		}
+	}
+	file_filter_message_proto_msgTypes[0].OneofWrappers = []interface{}{
+		(*TweetFilter_UserId)(nil),
+		(*TweetFilter_Page)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

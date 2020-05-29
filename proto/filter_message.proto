@@ -4,6 +4,9 @@ package v1;
 
 option go_package = ".;pb";
 
-message ListFilter{
-    uint32 page = 1;
+message TweetFilter{
+    oneof filter{
+        string user_id = 1;
+        uint32 page = 2;
+    }
 }
