@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = ".;pb";
+
+import "tweet_message.proto";
+import "filter_message.proto";
+
+// create tweet request
+message CreateTweetRequest{
+    string content = 2;
+}
+
+// create tweet response
+message CreateTweetResponse{
+    string id = 1;
+}
+
+// update tweet request
+message UpdateTweetRequest{
+    string id = 1;
+    string content = 2;
+}
+
+// update tweet response
+message UpdaeTweetResponse{}
+
+// Get tweet request
+message GetTweetRequest{
+    string id = 1;
+}
+
+// Get tweet response
+message GetTweetResponse{
+    Tweet tweet = 1;
+}
+
+// Delete tweet request
+message DeleteTweetRequest{
+    string id = 1;
+}
+
+// Delete tweet response
+message DeleteTweetResponse{}
+
+// Delete tweet request
+message ListTweetRequest{
+    oneof filter{
+        string user_id = 1;
+        ListFilter listFilter = 2;
+    }
+}
+
+// Delete tweet response
+message ListTweetResponse{
+    Tweet tweet = 1;
+}
+
+// tweetService
+service tweetService{
+    // create a tweet service
+    rpc Create(CreateTweetRequest) returns (CreateTweetResponse){}
+    // update a tweet service
+    rpc Update(UpdateTweetRequest) returns (UpdaeTweetResponse){}
+    // delete a tweet service
+    rpc Delete(DeleteTweetRequest) returns (DeleteTweetResponse){}
+    // get a tweet service
+    rpc Get(GetTweetRequest) returns (GetTweetResponse){}
+    // list a tweet service
+    rpc List(ListTweetRequest) returns (stream ListTweetResponse){}
+}

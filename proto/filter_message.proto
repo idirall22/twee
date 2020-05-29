@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = ".;pb";
+
+message ListFilter{
+    uint32 page = 1;
+}
