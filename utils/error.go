@@ -15,6 +15,9 @@ var (
 	// ErrUpdate could not update a record
 	ErrUpdate = fmt.Errorf("Could not update a record")
 
+	// ErrCreate could not create a record
+	ErrCreate = fmt.Errorf("Could not create a record")
+
 	// ErrUUID error to generate uuid
 	ErrUUID = fmt.Errorf("Could not create uuid")
 

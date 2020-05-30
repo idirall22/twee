@@ -7,7 +7,7 @@ option go_package = ".;pb";
 import "google/protobuf/timestamp.proto";
 
 message Tweet{
-    string id = 1;
+    int64 id = 1;
     string content = 2;
     string user_id = 3;
     google.protobuf.Timestamp created_at = 4;

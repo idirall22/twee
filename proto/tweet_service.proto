@@ -13,7 +13,7 @@ message CreateTweetRequest{
 
 // create tweet response
 message CreateTweetResponse{
-    string id = 1;
+    int64 id = 1;
 }
 
 // update tweet request
@@ -23,7 +23,7 @@ message UpdateTweetRequest{
 }
 
 // update tweet response
-message UpdaeTweetResponse{}
+message UpdateTweetResponse{}
 
 // Get tweet request
 message GetTweetRequest{
@@ -58,7 +58,7 @@ service tweetService{
     // create a tweet service
     rpc Create(CreateTweetRequest) returns (CreateTweetResponse){}
     // update a tweet service
-    rpc Update(UpdateTweetRequest) returns (UpdaeTweetResponse){}
+    rpc Update(UpdateTweetRequest) returns (UpdateTweetResponse){}
     // delete a tweet service
     rpc Delete(DeleteTweetRequest) returns (DeleteTweetResponse){}
     // get a tweet service
