@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	// postgres driver
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/idirall22/twee/pb"
 	postgresstore "github.com/idirall22/twee/tweet/store/postgres"
-	"google.golang.org/grpc/status"
 )
 
 // Server server
@@ -20,7 +22,7 @@ type Server struct {
 // NewServer create new tweet server
 func NewServer() (*Server, error) {
 	opts := postgresstore.NewPostgresOptions(
-		"localhost",
+		"0.0.0.0",
 		"postgres",
 		"password",
 		"tweets",
