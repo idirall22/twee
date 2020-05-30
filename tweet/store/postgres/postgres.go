@@ -73,7 +73,7 @@ func (p *PostgresTweetStore) Create(ctx context.Context, content string) (int64,
 }
 
 // Update tweet
-func (p *PostgresTweetStore) Update(ctx context.Context, tweet *pb.Tweet) error {
+func (p *PostgresTweetStore) Update(ctx context.Context, id int64, content string) error {
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -87,7 +87,7 @@ func (p *PostgresTweetStore) Update(ctx context.Context, tweet *pb.Tweet) error 
 		return fmt.Errorf("Could not prepare a statment: %v", err)
 	}
 
-	err = stmt.QueryRowContext(ctx, tweet.Id).Scan(&exists)
+	err = stmt.QueryRowContext(ctx, id).Scan(&exists)
 
 	if err != sql.ErrNoRows && !exists {
 		p.logger.Info("Could not update a tweet, Record Not exists")
@@ -105,7 +105,7 @@ func (p *PostgresTweetStore) Update(ctx context.Context, tweet *pb.Tweet) error 
 		return fmt.Errorf("Could not prepare a statment: %v", err)
 	}
 
-	_, err = stmt.ExecContext(ctx, tweet.Content, tweet.Id)
+	_, err = stmt.ExecContext(ctx, content, id)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Could not create a record: %v", err)
@@ -208,7 +208,7 @@ func (p *PostgresTweetStore) Get(ctx context.Context, id int64) (*pb.Tweet, erro
 }
 
 // List tweets
-func (p *PostgresTweetStore) List(ctx context.Context, page int) ([]*pb.Tweet, error) {
+func (p *PostgresTweetStore) List(ctx context.Context, userID int64, page int) ([]*pb.Tweet, error) {
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -217,11 +217,11 @@ func (p *PostgresTweetStore) List(ctx context.Context, page int) ([]*pb.Tweet, e
 
 	stmt, err := tx.PrepareContext(
 		ctx,
-		"SELECT user_id, content, created_at FROM tweets LIMIT 10 OFFSET %d",
+		"SELECT user_id, content, created_at FROM tweets WHERE user_id=%d LIMIT 10 OFFSET %d",
 	)
 
 	tweets := []*pb.Tweet{}
-	rows, err := stmt.QueryContext(ctx, page)
+	rows, err := stmt.QueryContext(ctx, userID, page)
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("Could not get tweets")

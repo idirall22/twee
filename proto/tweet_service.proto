@@ -18,7 +18,7 @@ message CreateTweetResponse{
 
 // update tweet request
 message UpdateTweetRequest{
-    string id = 1;
+    int64 id = 1;
     string content = 2;
 }
 
@@ -27,7 +27,7 @@ message UpdateTweetResponse{}
 
 // Get tweet request
 message GetTweetRequest{
-    string id = 1;
+    int64 id = 1;
 }
 
 // Get tweet response
@@ -37,7 +37,7 @@ message GetTweetResponse{
 
 // Delete tweet request
 message DeleteTweetRequest{
-    string id = 1;
+    int64 id = 1;
 }
 
 // Delete tweet response
