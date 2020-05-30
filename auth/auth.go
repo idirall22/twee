@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -14,9 +15,15 @@ import (
 	"github.com/idirall22/twee/pb"
 )
 
+var (
+	accesstokenDuration  = time.Minute * 15
+	refreshtokenDuration = time.Hour * 24 * 365
+)
+
 // Server auth server struct
 type Server struct {
-	authStore *apstore.PostgresAuthStore
+	authStore  *apstore.PostgresAuthStore
+	jwtManager *JwtManager
 }
 
 // NewAuthServer create new auth store
@@ -38,6 +45,11 @@ func NewAuthServer() (*Server, error) {
 	}
 	return &Server{
 		authStore: aStore,
+		jwtManager: NewJwtManager(
+			os.Getenv("JWT_SECRET"),
+			accesstokenDuration,
+			refreshtokenDuration,
+		),
 	}, nil
 }
 
@@ -87,9 +99,18 @@ func (s *Server) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResp
 		return nil, status.Errorf(codes.Unauthenticated, "Password not valid")
 	}
 
+	accessToken, err := s.jwtManager.GenerateAccessToken(user)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not generate access token")
+	}
+	refreshToken, err := s.jwtManager.GenerateRefreshToken(user)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Could not generate refresh token")
+	}
+
 	res := &pb.LoginResponse{
-		AccessToken:  "",
-		RefreshToken: "",
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	}
 
 	return res, nil
