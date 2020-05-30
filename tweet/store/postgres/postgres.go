@@ -4,48 +4,25 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"time"
 
+	"github.com/idirall22/twee/common"
+	option "github.com/idirall22/twee/options"
 	"github.com/idirall22/twee/pb"
 	"go.uber.org/zap"
 )
 
 // PostgresTweetStore store
 type PostgresTweetStore struct {
-	options *PostgresOptions
+	options *option.PostgresOptions
 	db      *sql.DB
 	logger  *zap.Logger
 }
 
 // NewPostgresTweetStore create new postgres store
-func NewPostgresTweetStore(opts *PostgresOptions) (*PostgresTweetStore, error) {
-	logger, err := zap.NewProduction()
+func NewPostgresTweetStore(opts *option.PostgresOptions) (*PostgresTweetStore, error) {
+	logger, db, err := common.SetupPostgres(opts)
 	if err != nil {
-		return nil, fmt.Errorf("Could not create looger: %v", err)
-	}
-
-	db, err := sql.Open("postgres", opts.String())
-	if err != nil {
-		attempt := 0
-
-		for {
-			time.Sleep(opts.attemptDuration)
-			db, err = sql.Open("postgres", opts.String())
-			if err != nil {
-				logger.Info(
-					fmt.Sprintf("Attempt: %d/%d --- Could not connect with database: %v",
-						attempt,
-						opts.GetMaxAttempt(),
-						err,
-					),
-				)
-			}
-			attempt++
-			if attempt >= opts.GetMaxAttempt() {
-				break
-			}
-		}
-		return nil, fmt.Errorf("Could not connect with database: %v", err)
+		return nil, fmt.Errorf("Could not connect to db: %v", err)
 	}
 
 	return &PostgresTweetStore{

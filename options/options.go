@@ -1,4 +1,4 @@
-package postgresstore
+package option
 
 import (
 	"fmt"

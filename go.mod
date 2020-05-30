@@ -9,7 +9,7 @@ require (
 	github.com/lib/pq v1.6.0
 	github.com/stretchr/testify v1.4.0
 	go.uber.org/zap v1.15.0
-	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
+	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/net v0.0.0-20200528225125-3c3fba18258b // indirect
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.24.0

@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	option "github.com/idirall22/twee/options"
 	"github.com/idirall22/twee/pb"
 	postgresstore "github.com/idirall22/twee/tweet/store/postgres"
 )
@@ -21,7 +22,7 @@ type Server struct {
 
 // NewServer create new tweet server
 func NewServer() (*Server, error) {
-	opts := postgresstore.NewPostgresOptions(
+	opts := option.NewPostgresOptions(
 		"0.0.0.0",
 		"postgres",
 		"password",

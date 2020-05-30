@@ -7,4 +7,5 @@ option go_package = ".;pb";
 message User{
     string id = 1;
     string username = 2;
+    string hash_password = 3;
 }
