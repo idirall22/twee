@@ -75,7 +75,7 @@ func (s *Server) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.Reg
 		return nil, status.Errorf(codes.Internal, "Could not Create user: %v", err)
 	}
 
-	return nil, nil
+	return &pb.RegisterResponse{}, nil
 }
 
 // Login authenticate user

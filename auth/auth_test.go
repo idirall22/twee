@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/idirall22/twee/pb"
+	sample "github.com/idirall22/twee/generator"
 
 	"github.com/idirall22/twee/auth"
 	"github.com/stretchr/testify/require"
@@ -13,6 +13,8 @@ import (
 
 func TestAuthServer(t *testing.T) {
 	t.Parallel()
+
+	// auth server
 	server, err := auth.NewAuthServer()
 	require.NoError(t, err)
 	require.NotNil(t, server)
@@ -20,20 +22,14 @@ func TestAuthServer(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	reqRegister := &pb.RegisterRequest{
-		Username: "user",
-		Password: "password",
-	}
-
+	// register new user
+	reqRegister := sample.RandomRegisterRequest()
 	res, err := server.Register(ctx, reqRegister)
 	require.NoError(t, err)
 	require.Nil(t, res)
 
-	reqLogin := &pb.LoginRequest{
-		Username: "user",
-		Password: "password",
-	}
-
+	// login user
+	reqLogin := sample.LoginRequestFromRegisterRequest(reqRegister)
 	resLogin, err := server.Login(ctx, reqLogin)
 	require.NoError(t, err)
 	require.NotNil(t, resLogin)
