@@ -40,31 +40,39 @@ func (s *PostgresAuthStore) Create(ctx context.Context, username, hashPassword s
 		return fmt.Errorf("Error to start transaction: %v", err)
 	}
 
-	exists := false
-	stmt, err := tx.PrepareContext(ctx, "SELECT EXISTS(SELECT 1 FROM users WHERE username='$1')")
+	stmt, err := tx.PrepareContext(
+		ctx,
+		"SELECT EXISTS(SELECT 1 FROM users WHERE username=$1);",
+	)
 
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Error to prepare stmt: %v", err)
 	}
 
+	var exists bool
 	err = stmt.QueryRowContext(ctx, username).Scan(&exists)
 
-	if exists {
+	if exists || err == sql.ErrNoRows {
+		tx.Rollback()
 		return fmt.Errorf("User Already exists")
 	}
 
 	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("Error to check if record already exists: %v", err)
 	}
 
-	stmt, err = tx.PrepareContext(ctx, "INSERT INTO users (username, hash_password) values ('$1', '$2')")
+	stmt, err = tx.PrepareContext(
+		ctx,
+		"INSERT INTO users (username, hash_password) values ($1, $2)",
+	)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Error to prepare stmt: %v", err)
 	}
 
-	_, err = stmt.ExecContext(ctx)
+	_, err = stmt.ExecContext(ctx, username, hashPassword)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Error to execute query: %v", err)
@@ -72,6 +80,7 @@ func (s *PostgresAuthStore) Create(ctx context.Context, username, hashPassword s
 
 	err = tx.Commit()
 	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("Error to commit transaction: %v", err)
 	}
 
@@ -85,14 +94,16 @@ func (s *PostgresAuthStore) Find(ctx context.Context, username string) (*pb.User
 		return nil, fmt.Errorf("Error to start transaction: %v", err)
 	}
 
-	stmt, err := tx.PrepareContext(ctx, "SELECT id, username FROM users WHERE username='$1'")
+	stmt, err := tx.PrepareContext(ctx, "SELECT id, hash_password FROM users WHERE username=$1")
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("Error to prepare stmt: %v", err)
 	}
 
-	user := &pb.User{Username: username}
-	err = stmt.QueryRowContext(ctx, username).Scan(&user.Id)
+	user := &pb.User{
+		Username: username,
+	}
+	err = stmt.QueryRowContext(ctx, username).Scan(&user.Id, &user.HashPassword)
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("Error to execute query: %v", err)

@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	// postgres driver
+	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -32,7 +34,7 @@ func NewAuthServer() (*Server, error) {
 		"0.0.0.0",
 		"postgres",
 		"password",
-		"auth_tweets",
+		"auth",
 		3,
 		5432,
 		time.Second,
@@ -70,7 +72,7 @@ func (s *Server) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.Reg
 
 	err = s.authStore.Create(ctx, req.GetUsername(), string(hashedPassword))
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not Create user")
+		return nil, status.Errorf(codes.Internal, "Could not Create user: %v", err)
 	}
 
 	return nil, nil
