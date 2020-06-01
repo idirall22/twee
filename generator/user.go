@@ -6,7 +6,7 @@ import (
 
 	"github.com/idirall22/twee/pb"
 
-	fake "github.com/brianvoe/gofakeit/data"
+	"github.com/brianvoe/gofakeit/data"
 )
 
 func init() {
@@ -15,7 +15,7 @@ func init() {
 
 // RandomRegisterRequest create random auth register request
 func RandomRegisterRequest() *pb.RegisterRequest {
-	persons := fake.Person["first"]
+	persons := data.Person["first"]
 	return &pb.RegisterRequest{
 		Username: persons[rand.Intn(len(persons))],
 		Password: "password",

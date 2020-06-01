@@ -44,9 +44,7 @@ message DeleteTweetRequest{
 message DeleteTweetResponse{}
 
 // Delete tweet request
-message ListTweetRequest{
-    string user_id = 1;
-}
+message ListTweetRequest{}
 
 // Delete tweet response
 message ListTweetResponse{

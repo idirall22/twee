@@ -1,5 +1,7 @@
 CREATE DATABASE tweets;
 
+\c tweets;
+
 CREATE TABLE tweets(
     id SERIAL PRIMARY KEY,
     content VARCHAR NOT NULL,

@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
+
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/idirall22/twee/common"
 	option "github.com/idirall22/twee/options"
@@ -34,17 +37,22 @@ func NewPostgresTweetStore(opts *option.PostgresOptions) (*PostgresTweetStore, e
 
 // Create tweet
 func (p *PostgresTweetStore) Create(ctx context.Context, content string) (int64, error) {
-	query := fmt.Sprintf(`INSERT INTO tweets (content, user_id) VALUES ('%s', '%s')`,
+	query := fmt.Sprintf(`
+		INSERT INTO tweets (content, user_id)
+		VALUES ('%s', '%s')
+		RETURNING  id`,
 		content, "1",
 	)
-	result, err := p.db.ExecContext(ctx, query)
+	var id int64
+	err := p.db.QueryRowContext(ctx, query).Scan(&id)
+
 	if err != nil {
 		return 0, fmt.Errorf("Could not create a record: %v", err)
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, fmt.Errorf("Could not get id of the record: %v", err)
-	}
+	// id, err := result.RowsAffected()
+	// if err != nil {
+	// 	return 0, fmt.Errorf("Could not get id of the record: %v", err)
+	// }
 
 	return id, nil
 }
@@ -57,8 +65,11 @@ func (p *PostgresTweetStore) Update(ctx context.Context, id int64, content strin
 		return fmt.Errorf("Could not init a transaction: %v", err)
 	}
 
-	exists := false
-	stmt, err := tx.PrepareContext(ctx, `SELECT EXISTS(SELECT 1 FROM tweets WHERE id=$1`)
+	var exists bool
+	stmt, err := tx.PrepareContext(
+		ctx,
+		"SELECT EXISTS(SELECT 1 FROM tweets WHERE id=$1)",
+	)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Could not prepare a statment: %v", err)
@@ -67,7 +78,6 @@ func (p *PostgresTweetStore) Update(ctx context.Context, id int64, content strin
 	err = stmt.QueryRowContext(ctx, id).Scan(&exists)
 
 	if err != sql.ErrNoRows && !exists {
-		p.logger.Info("Could not update a tweet, Record Not exists")
 		tx.Rollback()
 		return fmt.Errorf("Record not exists: %v", err)
 	}
@@ -76,7 +86,7 @@ func (p *PostgresTweetStore) Update(ctx context.Context, id int64, content strin
 		return fmt.Errorf("Could not get tweet infos: %v", err)
 	}
 
-	stmt, err = tx.PrepareContext(ctx, `UPDATE tweets SET content='%s' WHERE id=%d`)
+	stmt, err = tx.PrepareContext(ctx, `UPDATE tweets SET content=$1 WHERE id=$2`)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Could not prepare a statment: %v", err)
@@ -154,18 +164,20 @@ func (p *PostgresTweetStore) Get(ctx context.Context, id int64) (*pb.Tweet, erro
 
 	stmt, err := tx.PrepareContext(
 		ctx,
-		"SELECT user_id, content, created_at FROM tweets WHERE id=%d",
+		"SELECT user_id, content, created_at FROM tweets WHERE id=$1",
 	)
 
 	tweet := &pb.Tweet{}
+	var t time.Time
+
 	err = stmt.QueryRowContext(ctx, id).Scan(
 		&tweet.UserId,
 		&tweet.Content,
-		&tweet.CreatedAt,
+		&t,
 	)
+	tweet.CreatedAt, _ = ptypes.TimestampProto(t)
 
-	if err != sql.ErrNoRows {
-		p.logger.Info("Could not update a tweet, Record Not exists")
+	if err == sql.ErrNoRows {
 		tx.Rollback()
 		return nil, fmt.Errorf("Record not exists: %v", err)
 	}
@@ -194,23 +206,29 @@ func (p *PostgresTweetStore) List(ctx context.Context, userID int64, page int) (
 
 	stmt, err := tx.PrepareContext(
 		ctx,
-		"SELECT user_id, content, created_at FROM tweets WHERE user_id=%d LIMIT 10 OFFSET %d",
+		"SELECT user_id, content, created_at FROM tweets WHERE user_id=$1 LIMIT 10 OFFSET $2",
 	)
 
 	tweets := []*pb.Tweet{}
 	rows, err := stmt.QueryContext(ctx, userID, page)
+
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf("Could not get tweets")
 	}
 	defer rows.Close()
+
 	for rows.Next() {
 		tweet := &pb.Tweet{}
+		var t time.Time
+
 		err = rows.Scan(
 			&tweet.UserId,
 			&tweet.Content,
-			&tweet.CreatedAt,
+			&t,
 		)
+		tweet.CreatedAt, _ = ptypes.TimestampProto(t)
+
 		if err != nil {
 			tx.Rollback()
 			return nil, fmt.Errorf("Could not scan: %v", err)

@@ -78,7 +78,7 @@ func (s *Server) Update(ctx context.Context, req *pb.UpdateTweetRequest) (*pb.Up
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error to update the tweet: %v", err)
 	}
-	return nil, nil
+	return &pb.UpdateTweetResponse{}, nil
 }
 
 // Delete a tweet.
