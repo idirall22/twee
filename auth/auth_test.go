@@ -15,7 +15,7 @@ func TestAuthServer(t *testing.T) {
 	t.Parallel()
 
 	// auth server
-	server, err := auth.NewAuthServer()
+	server, err := auth.NewAuthServer(nil)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 

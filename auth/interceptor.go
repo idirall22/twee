@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -12,6 +13,9 @@ import (
 
 // ClaimKey used as a key context
 type ClaimKey string
+
+// AuthKey used as key for access token
+var AuthKey = "authorization"
 
 // JwtInterceptor struct
 type JwtInterceptor struct {
@@ -49,11 +53,19 @@ func (i *JwtInterceptor) isAuthorized(ctx context.Context) (*UserClaims, error) 
 		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated token not provided")
 	}
 	accessToken := values[0]
-
 	claims, err := i.jwtManager.Verify(accessToken)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "access token not valid")
 	}
 
 	return claims, nil
+}
+
+// GetUserInfosFromContext get user claims from context
+func GetUserInfosFromContext(ctx context.Context) (*UserClaims, error) {
+	userInfos, ok := ctx.Value(ClaimKey("claims")).(*UserClaims)
+	if !ok {
+		return nil, fmt.Errorf("could not parse user claim data")
+	}
+	return userInfos, nil
 }

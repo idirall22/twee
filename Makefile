@@ -5,7 +5,7 @@ up:
 	docker-compose up -d
 
 down:
-	docker-compose down -d
+	docker-compose down
 
 test-auth:
 	cd auth/ && go test -v ./...	

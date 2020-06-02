@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/idirall22/twee/auth"
+
 	// postgres driver
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc/codes"
@@ -45,12 +47,18 @@ func NewServer() (*Server, error) {
 
 // Create a tweet.
 func (s *Server) Create(ctx context.Context, req *pb.CreateTweetRequest) (*pb.CreateTweetResponse, error) {
+	// get user infos from context
+	userInfos, err := auth.GetUserInfosFromContext(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
 	content := req.Content
 	if len(content) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "tweet Content is empty")
 	}
 
-	id, err := s.tweetStore.Create(ctx, content)
+	id, err := s.tweetStore.Create(ctx, userInfos.ID, content)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Error to create a tweet: %v", err)
 	}
@@ -63,6 +71,12 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateTweetRequest) (*pb.Cr
 
 // Update a tweet.
 func (s *Server) Update(ctx context.Context, req *pb.UpdateTweetRequest) (*pb.UpdateTweetResponse, error) {
+	// get user infos from context
+	userInfos, err := auth.GetUserInfosFromContext(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
 	id := req.GetId()
 	content := req.GetContent()
 
@@ -74,7 +88,7 @@ func (s *Server) Update(ctx context.Context, req *pb.UpdateTweetRequest) (*pb.Up
 		return nil, status.Errorf(codes.InvalidArgument, "empty content")
 	}
 
-	err := s.tweetStore.Update(ctx, id, content)
+	err = s.tweetStore.Update(ctx, userInfos.ID, id, content)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error to update the tweet: %v", err)
 	}
@@ -83,9 +97,15 @@ func (s *Server) Update(ctx context.Context, req *pb.UpdateTweetRequest) (*pb.Up
 
 // Delete a tweet.
 func (s *Server) Delete(ctx context.Context, req *pb.DeleteTweetRequest) (*pb.DeleteTweetResponse, error) {
+	// get user infos from context
+	userInfos, err := auth.GetUserInfosFromContext(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
 	id := req.GetId()
 
-	err := s.tweetStore.Delete(ctx, id)
+	err = s.tweetStore.Delete(ctx, userInfos.ID, id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not delete tweet: %v", err)
 	}
@@ -95,8 +115,14 @@ func (s *Server) Delete(ctx context.Context, req *pb.DeleteTweetRequest) (*pb.De
 
 // Get tweet by user id and tweet id.
 func (s *Server) Get(ctx context.Context, req *pb.GetTweetRequest) (*pb.GetTweetResponse, error) {
+	// get user infos from context
+	userInfos, err := auth.GetUserInfosFromContext(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
 	id := req.GetId()
-	tweet, err := s.tweetStore.Get(ctx, id)
+	tweet, err := s.tweetStore.Get(ctx, userInfos.ID, id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not get tweet: %v", err)
 	}

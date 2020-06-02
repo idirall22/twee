@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	// postgres driver
@@ -30,7 +29,7 @@ type Server struct {
 }
 
 // NewAuthServer create new auth store
-func NewAuthServer() (*Server, error) {
+func NewAuthServer(jwtManager *JwtManager) (*Server, error) {
 	opts := option.NewPostgresOptions(
 		"0.0.0.0",
 		"postgres",
@@ -47,12 +46,8 @@ func NewAuthServer() (*Server, error) {
 		return nil, fmt.Errorf("Could not Start store: %v", err)
 	}
 	return &Server{
-		authStore: aStore,
-		jwtManager: NewJwtManager(
-			os.Getenv("JWT_SECRET"),
-			accesstokenDuration,
-			refreshtokenDuration,
-		),
+		authStore:  aStore,
+		jwtManager: jwtManager,
 	}, nil
 }
 

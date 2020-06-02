@@ -36,7 +36,7 @@ func NewPostgresTweetStore(opts *option.PostgresOptions) (*PostgresTweetStore, e
 }
 
 // Create tweet
-func (p *PostgresTweetStore) Create(ctx context.Context, content string) (int64, error) {
+func (p *PostgresTweetStore) Create(ctx context.Context, userID int64, content string) (int64, error) {
 	query := fmt.Sprintf(`
 		INSERT INTO tweets (content, user_id)
 		VALUES ('%s', '%s')
@@ -58,7 +58,7 @@ func (p *PostgresTweetStore) Create(ctx context.Context, content string) (int64,
 }
 
 // Update tweet
-func (p *PostgresTweetStore) Update(ctx context.Context, id int64, content string) error {
+func (p *PostgresTweetStore) Update(ctx context.Context, userID int64, id int64, content string) error {
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -107,7 +107,7 @@ func (p *PostgresTweetStore) Update(ctx context.Context, id int64, content strin
 }
 
 // Delete tweet
-func (p *PostgresTweetStore) Delete(ctx context.Context, id int64) error {
+func (p *PostgresTweetStore) Delete(ctx context.Context, userID int64, id int64) error {
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -159,7 +159,7 @@ func (p *PostgresTweetStore) Delete(ctx context.Context, id int64) error {
 }
 
 // Get tweet
-func (p *PostgresTweetStore) Get(ctx context.Context, id int64) (*pb.Tweet, error) {
+func (p *PostgresTweetStore) Get(ctx context.Context, userID int64, id int64) (*pb.Tweet, error) {
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {

@@ -9,13 +9,13 @@ import (
 // Store interface
 type Store interface {
 	// create tweet
-	Create(ctx context.Context, content string) (int64, error)
+	Create(ctx context.Context, userID int64, content string) (int64, error)
 	// update tweet
-	Update(ctx context.Context, id int64, content string) error
+	Update(ctx context.Context, userID int64, id int64, content string) error
 	// delete tweet
-	Delete(ctx context.Context, id int64) error
+	Delete(ctx context.Context, userID int64, id int64) error
 	// get tweet
-	Get(ctx context.Context, id int64) (*pb.Tweet, error)
+	Get(ctx context.Context, userID int64, id int64) (*pb.Tweet, error)
 	// list tweets
 	List(ctx context.Context, userID int64, page int) ([]*pb.Tweet, error)
 	// Close

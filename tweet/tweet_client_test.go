@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"google.golang.org/grpc/metadata"
+
 	"github.com/idirall22/twee/auth"
 
 	sample "github.com/idirall22/twee/generator"
@@ -20,17 +22,33 @@ import (
 func TestCreateTweets(t *testing.T) {
 	t.Parallel()
 
+	jwtManager := auth.NewJwtManager(
+		"secret",
+		time.Minute*15,
+		time.Hour*24*365,
+	)
+
 	// start tweets server and get a tweets client
-	addr := startAuthTestServer(t)
+	addr := startAuthTestServer(t, jwtManager)
 	client := startClient(t, addr)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	authServer, err := auth.NewAuthServer()
+	authServer, err := auth.NewAuthServer(jwtManager)
 	require.NoError(t, err)
 	require.NotNil(t, authServer)
-	// authServer.Login(ctx)
+
+	reqReg := sample.RandomRegisterRequest()
+	_, err = authServer.Register(ctx, reqReg)
+	require.NoError(t, err)
+	resLogin, err := authServer.Login(ctx, &pb.LoginRequest{
+		Username: reqReg.Username,
+		Password: reqReg.Password,
+	})
+
+	token := resLogin.AccessToken
+	ctx = metadata.AppendToOutgoingContext(ctx, auth.AuthKey, token)
 
 	// create tweets
 	createdIds := []int64{}
@@ -51,7 +69,6 @@ func TestCreateTweets(t *testing.T) {
 	for {
 		res, err := stream.Recv()
 		if err == io.EOF {
-			log.Println("No more data")
 			break
 		}
 		if err != nil {
@@ -69,19 +86,13 @@ func TestCreateTweets(t *testing.T) {
 }
 
 // start auth server
-func startAuthTestServer(t *testing.T) string {
+func startAuthTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
 	server, err := tweet.NewServer()
 	require.NoError(t, err)
 	require.NotNil(t, server)
-	// jwtManager := auth.NewJwtManager(
-	// 	"secret",
-	// 	time.Minute*15,
-	// 	time.Hour*24*365,
-	// )
 
-	// jwtInterceptor := auth.NewJwtInterceptor(jwtManager)
-	// grpc.UnaryInterceptor(jwtInterceptor.Unary())
-	grpcServer := grpc.NewServer()
+	jwtInterceptor := auth.NewJwtInterceptor(jwtManager)
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(jwtInterceptor.Unary()))
 	pb.RegisterTweetServiceServer(grpcServer, server)
 
 	listner, err := net.Listen("tcp", ":0")
