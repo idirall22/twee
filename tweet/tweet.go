@@ -90,7 +90,7 @@ func (s *Server) Delete(ctx context.Context, req *pb.DeleteTweetRequest) (*pb.De
 		return nil, status.Errorf(codes.Internal, "Could not delete tweet: %v", err)
 	}
 
-	return nil, nil
+	return &pb.DeleteTweetResponse{}, nil
 }
 
 // Get tweet by user id and tweet id.

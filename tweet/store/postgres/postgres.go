@@ -114,8 +114,8 @@ func (p *PostgresTweetStore) Delete(ctx context.Context, id int64) error {
 		return fmt.Errorf("Could not init a transaction: %v", err)
 	}
 
-	exists := false
-	stmt, err := tx.PrepareContext(ctx, `SELECT EXISTS(SELECT 1 FROM tweets WHERE id=$1`)
+	var exists bool
+	stmt, err := tx.PrepareContext(ctx, `SELECT EXISTS(SELECT 1 FROM tweets WHERE id=$1)`)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Could not prepare a statment: %v", err)
@@ -123,8 +123,12 @@ func (p *PostgresTweetStore) Delete(ctx context.Context, id int64) error {
 
 	err = stmt.QueryRowContext(ctx, id).Scan(&exists)
 
-	if err != sql.ErrNoRows && !exists {
-		p.logger.Info("Could not update a tweet, Record Not exists")
+	if !exists {
+		return fmt.Errorf("Record not exists")
+	}
+
+	if err == sql.ErrNoRows {
+		p.logger.Info("Could not delete a tweet, Record Not exists")
 		tx.Rollback()
 		return fmt.Errorf("Record not exists: %v", err)
 	}
@@ -133,10 +137,10 @@ func (p *PostgresTweetStore) Delete(ctx context.Context, id int64) error {
 		return fmt.Errorf("Could not get tweet infos: %v", err)
 	}
 
-	stmt, err = tx.PrepareContext(ctx, `DELETE tweets WHERE WHERE id=%d`)
+	stmt, err = tx.PrepareContext(ctx, `DELETE FROM tweets WHERE id=$1`)
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("Could not prepare a statment: %v", err)
+		return fmt.Errorf("Could not prepare delete statment: %v", err)
 	}
 
 	_, err = stmt.ExecContext(ctx, id)
@@ -206,7 +210,7 @@ func (p *PostgresTweetStore) List(ctx context.Context, userID int64, page int) (
 
 	stmt, err := tx.PrepareContext(
 		ctx,
-		"SELECT user_id, content, created_at FROM tweets WHERE user_id=$1 LIMIT 10 OFFSET $2",
+		"SELECT id, user_id, content, created_at FROM tweets WHERE user_id=$1 LIMIT 10 OFFSET $2",
 	)
 
 	tweets := []*pb.Tweet{}
@@ -223,6 +227,7 @@ func (p *PostgresTweetStore) List(ctx context.Context, userID int64, page int) (
 		var t time.Time
 
 		err = rows.Scan(
+			&tweet.Id,
 			&tweet.UserId,
 			&tweet.Content,
 			&t,

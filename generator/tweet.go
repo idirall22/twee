@@ -34,6 +34,11 @@ func NewRequestListTweet(id int64) *pb.ListTweetRequest {
 	return &pb.ListTweetRequest{}
 }
 
+// NewRequestDeleteTweet create new request delete tweet
+func NewRequestDeleteTweet(id int64) *pb.DeleteTweetRequest {
+	return &pb.DeleteTweetRequest{Id: id}
+}
+
 func randomWord() string {
 	words := data.Lorem["word"]
 	return words[rand.Intn(len(words))]

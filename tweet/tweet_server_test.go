@@ -38,4 +38,10 @@ func TestServer(t *testing.T) {
 	resGet, err := tweetServer.Get(ctx, reqGet)
 	require.NoError(t, err)
 	require.NotNil(t, resGet)
+
+	// delete tweet
+	reqDel := sample.NewRequestDeleteTweet(resCreate.Id)
+	resDel, err := tweetServer.Delete(ctx, reqDel)
+	require.NoError(t, err)
+	require.NotNil(t, resDel)
 }

@@ -37,7 +37,7 @@ func NewAuthServer() (*Server, error) {
 		"password",
 		"auth",
 		3,
-		5432,
+		5431,
 		time.Second,
 	)
 

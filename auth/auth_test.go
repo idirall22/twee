@@ -26,7 +26,7 @@ func TestAuthServer(t *testing.T) {
 	reqRegister := sample.RandomRegisterRequest()
 	res, err := server.Register(ctx, reqRegister)
 	require.NoError(t, err)
-	require.Nil(t, res)
+	require.NotNil(t, res)
 
 	// login user
 	reqLogin := sample.LoginRequestFromRegisterRequest(reqRegister)
