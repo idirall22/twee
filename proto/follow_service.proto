@@ -15,8 +15,7 @@ message RequestFollow{
 
 message ResponseFollow{}
 
-message RequestUnfollow{
-    int64 followee = 1;
+service FollowService{
+    // ToggleFollow 
+    rpc ToggleFollow(RequestFollow) returns (ResponseFollow);
 }
-
-message ResponseUnfollow{}

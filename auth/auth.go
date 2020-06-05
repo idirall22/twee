@@ -34,9 +34,9 @@ func NewAuthServer(jwtManager *JwtManager) (*Server, error) {
 		"0.0.0.0",
 		"postgres",
 		"password",
-		"auth",
+		"twee",
 		3,
-		5431,
+		5432,
 		time.Second,
 	)
 

@@ -28,7 +28,7 @@ func NewServer() (*Server, error) {
 		"0.0.0.0",
 		"postgres",
 		"password",
-		"tweets",
+		"twee",
 		3,
 		5432,
 		time.Second,
