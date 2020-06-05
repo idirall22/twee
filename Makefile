@@ -10,6 +10,9 @@ down:
 test-auth:
 	cd auth/ && go test -v ./...	
 
+test-timeline:
+	cd timeline/ && go test -v ./...	
+
 test-follow:
 	cd follow/ && go test -v ./...	
 

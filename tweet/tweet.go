@@ -134,11 +134,14 @@ func (s *Server) Get(ctx context.Context, req *pb.GetTweetRequest) (*pb.GetTweet
 
 // List a user tweets using user id.
 func (s *Server) List(req *pb.ListTweetRequest, stream pb.TweetService_ListServer) error {
-	// TODO: get userid from jwt token
-	userID := int64(1)
+	// get user infos from context
+	userInfos, err := auth.GetUserInfosFromContext(stream.Context())
+	if err != nil {
+		return status.Errorf(codes.InvalidArgument, err.Error())
+	}
 	page := 1
 
-	tweets, err := s.tweetStore.List(stream.Context(), userID, page)
+	tweets, err := s.tweetStore.List(stream.Context(), userInfos.ID, page)
 	if err != nil {
 		return status.Errorf(codes.Internal, "Could not list tweets: %v", err)
 	}
