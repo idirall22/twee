@@ -5,15 +5,9 @@ CREATE DATABASE twee;
 CREATE TABLE users(
     id SERIAL PRIMARY KEY,
     username VARCHAR NOT NULL,
-    hash_password VARCHAR NOT NULL
-);
-
-CREATE TABLE profiles(
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    followee_count INTEGER,
-    follower_count INTEGER,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    hash_password VARCHAR NOT NULL,
+    followee_count INTEGER DEFAULT 0,
+    follower_count INTEGER DEFAULT 0
 );
 
 CREATE TABLE tweets(

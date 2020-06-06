@@ -84,53 +84,6 @@ func (x *RequestListUsers) GetLimit() int32 {
 	return 0
 }
 
-type ResposneListUsers struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Profile *Profile `protobuf:"bytes,1,opt,name=profile,proto3" json:"profile,omitempty"`
-}
-
-func (x *ResposneListUsers) Reset() {
-	*x = ResposneListUsers{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_user_service_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ResposneListUsers) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ResposneListUsers) ProtoMessage() {}
-
-func (x *ResposneListUsers) ProtoReflect() protoreflect.Message {
-	mi := &file_user_service_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ResposneListUsers.ProtoReflect.Descriptor instead.
-func (*ResposneListUsers) Descriptor() ([]byte, []int) {
-	return file_user_service_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *ResposneListUsers) GetProfile() *Profile {
-	if x != nil {
-		return x.Profile
-	}
-	return nil
-}
-
 type RequestUserProfile struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -142,7 +95,7 @@ type RequestUserProfile struct {
 func (x *RequestUserProfile) Reset() {
 	*x = RequestUserProfile{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_service_proto_msgTypes[2]
+		mi := &file_user_service_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -155,7 +108,7 @@ func (x *RequestUserProfile) String() string {
 func (*RequestUserProfile) ProtoMessage() {}
 
 func (x *RequestUserProfile) ProtoReflect() protoreflect.Message {
-	mi := &file_user_service_proto_msgTypes[2]
+	mi := &file_user_service_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -168,7 +121,7 @@ func (x *RequestUserProfile) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestUserProfile.ProtoReflect.Descriptor instead.
 func (*RequestUserProfile) Descriptor() ([]byte, []int) {
-	return file_user_service_proto_rawDescGZIP(), []int{2}
+	return file_user_service_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *RequestUserProfile) GetUsername() string {
@@ -178,31 +131,31 @@ func (x *RequestUserProfile) GetUsername() string {
 	return ""
 }
 
-type ResponseUserProfile struct {
+type ResposneUser struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Profile *Profile `protobuf:"bytes,1,opt,name=profile,proto3" json:"profile,omitempty"`
+	User *User `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 }
 
-func (x *ResponseUserProfile) Reset() {
-	*x = ResponseUserProfile{}
+func (x *ResposneUser) Reset() {
+	*x = ResposneUser{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_service_proto_msgTypes[3]
+		mi := &file_user_service_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *ResponseUserProfile) String() string {
+func (x *ResposneUser) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ResponseUserProfile) ProtoMessage() {}
+func (*ResposneUser) ProtoMessage() {}
 
-func (x *ResponseUserProfile) ProtoReflect() protoreflect.Message {
-	mi := &file_user_service_proto_msgTypes[3]
+func (x *ResposneUser) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -213,14 +166,14 @@ func (x *ResponseUserProfile) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ResponseUserProfile.ProtoReflect.Descriptor instead.
-func (*ResponseUserProfile) Descriptor() ([]byte, []int) {
-	return file_user_service_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use ResposneUser.ProtoReflect.Descriptor instead.
+func (*ResposneUser) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ResponseUserProfile) GetProfile() *Profile {
+func (x *ResposneUser) GetUser() *User {
 	if x != nil {
-		return x.Profile
+		return x.User
 	}
 	return nil
 }
@@ -234,28 +187,22 @@ var file_user_service_proto_rawDesc = []byte{
 	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x4c, 0x69, 0x73, 0x74, 0x55, 0x73, 0x65, 0x72, 0x73,
 	0x12, 0x16, 0x0a, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05,
 	0x52, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6d, 0x69,
-	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x22, 0x3a,
-	0x0a, 0x11, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x73, 0x6e, 0x65, 0x4c, 0x69, 0x73, 0x74, 0x55, 0x73,
-	0x65, 0x72, 0x73, 0x12, 0x25, 0x0a, 0x07, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0b, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c,
-	0x65, 0x52, 0x07, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x22, 0x30, 0x0a, 0x12, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x55, 0x73, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65,
-	0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3c, 0x0a, 0x13,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x55, 0x73, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x66,
-	0x69, 0x6c, 0x65, 0x12, 0x25, 0x0a, 0x07, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0b, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c,
-	0x65, 0x52, 0x07, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x32, 0x84, 0x01, 0x0a, 0x0b, 0x55,
-	0x73, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x37, 0x0a, 0x04, 0x4c, 0x69,
-	0x73, 0x74, 0x12, 0x14, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x4c,
-	0x69, 0x73, 0x74, 0x55, 0x73, 0x65, 0x72, 0x73, 0x1a, 0x15, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x73, 0x6e, 0x65, 0x4c, 0x69, 0x73, 0x74, 0x55, 0x73, 0x65, 0x72, 0x73, 0x22,
-	0x00, 0x30, 0x01, 0x12, 0x3c, 0x0a, 0x07, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x12, 0x16,
-	0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x55, 0x73, 0x65, 0x72, 0x50,
-	0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x1a, 0x17, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x55, 0x73, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x22,
-	0x00, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x22, 0x30,
+	0x0a, 0x12, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x55, 0x73, 0x65, 0x72, 0x50, 0x72, 0x6f,
+	0x66, 0x69, 0x6c, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65,
+	0x22, 0x2c, 0x0a, 0x0c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x73, 0x6e, 0x65, 0x55, 0x73, 0x65, 0x72,
+	0x12, 0x1c, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x08,
+	0x2e, 0x76, 0x31, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x32, 0x78,
+	0x0a, 0x0b, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x32, 0x0a,
+	0x04, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x14, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x4c, 0x69, 0x73, 0x74, 0x55, 0x73, 0x65, 0x72, 0x73, 0x1a, 0x10, 0x2e, 0x76, 0x31,
+	0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x73, 0x6e, 0x65, 0x55, 0x73, 0x65, 0x72, 0x22, 0x00, 0x30,
+	0x01, 0x12, 0x35, 0x0a, 0x07, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x12, 0x16, 0x2e, 0x76,
+	0x31, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x55, 0x73, 0x65, 0x72, 0x50, 0x72, 0x6f,
+	0x66, 0x69, 0x6c, 0x65, 0x1a, 0x10, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x73,
+	0x6e, 0x65, 0x55, 0x73, 0x65, 0x72, 0x22, 0x00, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -270,26 +217,24 @@ func file_user_service_proto_rawDescGZIP() []byte {
 	return file_user_service_proto_rawDescData
 }
 
-var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_user_service_proto_goTypes = []interface{}{
-	(*RequestListUsers)(nil),    // 0: v1.RequestListUsers
-	(*ResposneListUsers)(nil),   // 1: v1.ResposneListUsers
-	(*RequestUserProfile)(nil),  // 2: v1.RequestUserProfile
-	(*ResponseUserProfile)(nil), // 3: v1.ResponseUserProfile
-	(*Profile)(nil),             // 4: v1.Profile
+	(*RequestListUsers)(nil),   // 0: v1.RequestListUsers
+	(*RequestUserProfile)(nil), // 1: v1.RequestUserProfile
+	(*ResposneUser)(nil),       // 2: v1.ResposneUser
+	(*User)(nil),               // 3: v1.User
 }
 var file_user_service_proto_depIdxs = []int32{
-	4, // 0: v1.ResposneListUsers.profile:type_name -> v1.Profile
-	4, // 1: v1.ResponseUserProfile.profile:type_name -> v1.Profile
-	0, // 2: v1.UserService.List:input_type -> v1.RequestListUsers
-	2, // 3: v1.UserService.Profile:input_type -> v1.RequestUserProfile
-	1, // 4: v1.UserService.List:output_type -> v1.ResposneListUsers
-	3, // 5: v1.UserService.Profile:output_type -> v1.ResponseUserProfile
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 0: v1.ResposneUser.user:type_name -> v1.User
+	0, // 1: v1.UserService.List:input_type -> v1.RequestListUsers
+	1, // 2: v1.UserService.Profile:input_type -> v1.RequestUserProfile
+	2, // 3: v1.UserService.List:output_type -> v1.ResposneUser
+	2, // 4: v1.UserService.Profile:output_type -> v1.ResposneUser
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_user_service_proto_init() }
@@ -312,18 +257,6 @@ func file_user_service_proto_init() {
 			}
 		}
 		file_user_service_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResposneListUsers); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_user_service_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RequestUserProfile); i {
 			case 0:
 				return &v.state
@@ -335,8 +268,8 @@ func file_user_service_proto_init() {
 				return nil
 			}
 		}
-		file_user_service_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResponseUserProfile); i {
+		file_user_service_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResposneUser); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -354,7 +287,7 @@ func file_user_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_user_service_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -383,7 +316,7 @@ type UserServiceClient interface {
 	// List users
 	List(ctx context.Context, in *RequestListUsers, opts ...grpc.CallOption) (UserService_ListClient, error)
 	// get user profile
-	Profile(ctx context.Context, in *RequestUserProfile, opts ...grpc.CallOption) (*ResponseUserProfile, error)
+	Profile(ctx context.Context, in *RequestUserProfile, opts ...grpc.CallOption) (*ResposneUser, error)
 }
 
 type userServiceClient struct {
@@ -410,7 +343,7 @@ func (c *userServiceClient) List(ctx context.Context, in *RequestListUsers, opts
 }
 
 type UserService_ListClient interface {
-	Recv() (*ResposneListUsers, error)
+	Recv() (*ResposneUser, error)
 	grpc.ClientStream
 }
 
@@ -418,16 +351,16 @@ type userServiceListClient struct {
 	grpc.ClientStream
 }
 
-func (x *userServiceListClient) Recv() (*ResposneListUsers, error) {
-	m := new(ResposneListUsers)
+func (x *userServiceListClient) Recv() (*ResposneUser, error) {
+	m := new(ResposneUser)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (c *userServiceClient) Profile(ctx context.Context, in *RequestUserProfile, opts ...grpc.CallOption) (*ResponseUserProfile, error) {
-	out := new(ResponseUserProfile)
+func (c *userServiceClient) Profile(ctx context.Context, in *RequestUserProfile, opts ...grpc.CallOption) (*ResposneUser, error) {
+	out := new(ResposneUser)
 	err := c.cc.Invoke(ctx, "/v1.UserService/Profile", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -440,7 +373,7 @@ type UserServiceServer interface {
 	// List users
 	List(*RequestListUsers, UserService_ListServer) error
 	// get user profile
-	Profile(context.Context, *RequestUserProfile) (*ResponseUserProfile, error)
+	Profile(context.Context, *RequestUserProfile) (*ResposneUser, error)
 }
 
 // UnimplementedUserServiceServer can be embedded to have forward compatible implementations.
@@ -450,7 +383,7 @@ type UnimplementedUserServiceServer struct {
 func (*UnimplementedUserServiceServer) List(*RequestListUsers, UserService_ListServer) error {
 	return status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (*UnimplementedUserServiceServer) Profile(context.Context, *RequestUserProfile) (*ResponseUserProfile, error) {
+func (*UnimplementedUserServiceServer) Profile(context.Context, *RequestUserProfile) (*ResposneUser, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Profile not implemented")
 }
 
@@ -467,7 +400,7 @@ func _UserService_List_Handler(srv interface{}, stream grpc.ServerStream) error 
 }
 
 type UserService_ListServer interface {
-	Send(*ResposneListUsers) error
+	Send(*ResposneUser) error
 	grpc.ServerStream
 }
 
@@ -475,7 +408,7 @@ type userServiceListServer struct {
 	grpc.ServerStream
 }
 
-func (x *userServiceListServer) Send(m *ResposneListUsers) error {
+func (x *userServiceListServer) Send(m *ResposneUser) error {
 	return x.ServerStream.SendMsg(m)
 }
 

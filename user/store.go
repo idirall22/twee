@@ -9,7 +9,7 @@ import (
 // Store user interface
 type Store interface {
 	// List users profile
-	List(ctx context.Context, limit, offset int32, found func(profile *pb.Profile) error) error
+	List(ctx context.Context, limit, offset int32, found func(user *pb.User) error) error
 	// Get user profile by username
-	Profile(ctx context.Context, username string) (*pb.Profile, error)
+	Profile(ctx context.Context, username string) (*pb.User, error)
 }

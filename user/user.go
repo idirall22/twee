@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/idirall22/twee/pb"
-	ustore "github.com/idirall22/twee/users/store"
+	ustore "github.com/idirall22/twee/user/store"
 
 	option "github.com/idirall22/twee/options"
 )
@@ -34,10 +34,10 @@ func NewUserServer(opts *option.PostgresOptions) (*Server, error) {
 func (s *Server) List(req *pb.RequestListUsers, stream pb.UserService_ListServer) error {
 	err := s.userStore.List(
 		stream.Context(),
-		req.GetOffset(),
 		req.GetLimit(),
-		func(profile *pb.Profile) error {
-			res := &pb.ResposneListUsers{Profile: profile}
+		req.GetOffset(),
+		func(user *pb.User) error {
+			res := &pb.ResposneUser{User: user}
 			err := stream.Send(res)
 			if err != nil {
 				return status.Errorf(codes.Internal, "Error stream profiles: %v", err)
@@ -54,15 +54,15 @@ func (s *Server) List(req *pb.RequestListUsers, stream pb.UserService_ListServer
 }
 
 // Profile get user profile
-func (s *Server) Profile(ctx context.Context, req *pb.RequestUserProfile) (*pb.ResponseUserProfile, error) {
+func (s *Server) Profile(ctx context.Context, req *pb.RequestUserProfile) (*pb.ResposneUser, error) {
 	if len(req.GetUsername()) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "Username should not be empty")
 	}
 
-	profile, err := s.userStore.Profile(ctx, req.GetUsername())
+	user, err := s.userStore.Profile(ctx, req.GetUsername())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Error to fetch user profile: %v", err)
 	}
 
-	return &pb.ResponseUserProfile{Profile: profile}, nil
+	return &pb.ResposneUser{User: user}, nil
 }

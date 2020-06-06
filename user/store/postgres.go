@@ -30,18 +30,16 @@ func NewPostgresUserStore(opts *option.PostgresOptions) (*PostgresUserStore, err
 }
 
 // List users profile
-func (s *PostgresUserStore) List(ctx context.Context, limit, offset int32, found func(profile *pb.Profile) error) error {
+func (s *PostgresUserStore) List(ctx context.Context, limit, offset int32, found func(user *pb.User) error) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("Could not start transaction: %v", err)
 	}
 	defer tx.Rollback()
+
 	stmt, err := tx.PrepareContext(ctx, `
-		SELECT
-		p.id, p.user_id, p.followee_count, p.follower_count, u.id, u.username
-		FROM profiles AS p
-		INNER JOIN users AS u ON p.user_id=u.id
-		LIMIT $1 OFFSET $2
+	SELECT id, username, followee_count, follower_count
+	FROM users LIMIT $1 OFFSET $2
 	`)
 
 	if err != nil {
@@ -55,23 +53,19 @@ func (s *PostgresUserStore) List(ctx context.Context, limit, offset int32, found
 	defer rows.Close()
 
 	for rows.Next() {
-		profile := &pb.Profile{}
 		user := &pb.User{}
 		err := rows.Scan(
-			&profile.Id,
-			&profile.UserId,
-			&profile.FolloweeCount,
-			&profile.FollowerCount,
 			&user.Id,
 			&user.Username,
+			&user.FolloweeCount,
+			&user.FollowerCount,
 		)
-		profile.User = user
 
 		if err != nil {
 			return fmt.Errorf("Could not scan data: %v", err)
 		}
 
-		err = found(profile)
+		err = found(user)
 		if err != nil {
 			return fmt.Errorf("Could not stream data: %v", err)
 		}
@@ -85,7 +79,7 @@ func (s *PostgresUserStore) List(ctx context.Context, limit, offset int32, found
 }
 
 // Profile Get user profile by username
-func (s *PostgresUserStore) Profile(ctx context.Context, username string) (*pb.Profile, error) {
+func (s *PostgresUserStore) Profile(ctx context.Context, username string) (*pb.User, error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Could not start transaction: %v", err)
@@ -93,26 +87,21 @@ func (s *PostgresUserStore) Profile(ctx context.Context, username string) (*pb.P
 	defer tx.Rollback()
 
 	stmt, err := tx.PrepareContext(ctx, `
-		SELECT p.id, p.user_id, p.followee_count, p.follower_count, u.id, u.username
-		FROM (SELECT * FROM users WHERE username=$1 LIMIT 1) as u
-		INNER JOIN (SELECT * FROM profiles WHERE u.id=user_id) as p
+		SELECT id, username, followee_count, follower_count
+		FROM users LIMIT 1
 	`)
 
 	if err != nil {
 		return nil, fmt.Errorf("Could not prepare SELECT statment: %v", err)
 	}
 
-	profile := &pb.Profile{}
 	user := &pb.User{}
 	err = stmt.QueryRowContext(ctx).Scan(
-		&profile.Id,
-		&profile.UserId,
-		&profile.FolloweeCount,
-		&profile.FollowerCount,
 		&user.Id,
 		&user.Username,
+		&user.FolloweeCount,
+		&user.FollowerCount,
 	)
-	profile.User = user
 
 	if err != nil {
 		return nil, fmt.Errorf("Could not query: %v", err)
@@ -122,5 +111,5 @@ func (s *PostgresUserStore) Profile(ctx context.Context, username string) (*pb.P
 	if err != nil {
 		return nil, fmt.Errorf("Could not commit transaction: %v", err)
 	}
-	return profile, nil
+	return user, nil
 }
