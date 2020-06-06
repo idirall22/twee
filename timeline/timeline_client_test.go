@@ -78,26 +78,26 @@ func TestTimeline(t *testing.T) {
 
 	for i, f := range follow {
 		token := accessTokens[i]
-		ctx = metadata.AppendToOutgoingContext(ctx, auth.AuthKey, token)
+		uctx := metadata.AppendToOutgoingContext(context.Background(), auth.AuthKey, token)
 
 		for _, id := range f.followees {
 			req := &pb.RequestFollow{Followee: id}
-			res, err := followClient.ToggleFollow(ctx, req)
+			res, err := followClient.ToggleFollow(uctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, res)
 		}
 
-		for i := 0; i < 5; i++ {
+		for i := 0; i < 2; i++ {
 			req := sample.NewRequestCreateTweet()
-			res, err := tweetClient.Create(ctx, req)
+			res, err := tweetClient.Create(uctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, res)
 		}
 
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, auth.AuthKey, accessTokens[0])
+	uctx := metadata.AppendToOutgoingContext(context.Background(), auth.AuthKey, accessTokens[0])
 
-	stream, err := timelineClient.Timeline(ctx, &pb.TimelineRequest{Type: true})
+	stream, err := timelineClient.Timeline(uctx, &pb.TimelineRequest{Type: true})
 	require.NoError(t, err)
 	require.NotNil(t, stream)
 
@@ -121,7 +121,10 @@ func startTimelineTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
 	require.NotNil(t, server)
 
 	jwtInterceptor := auth.NewJwtInterceptor(jwtManager)
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(jwtInterceptor.Unary()))
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(jwtInterceptor.Unary()),
+		grpc.StreamInterceptor(jwtInterceptor.Stream()),
+	)
 	pb.RegisterTimelineServiceServer(grpcServer, server)
 
 	listner, err := net.Listen("tcp", ":0")
@@ -198,7 +201,8 @@ func startTweetTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
 	require.NoError(t, err)
 	require.NotNil(t, server)
 
-	grpcServer := grpc.NewServer()
+	jwtInterceptor := auth.NewJwtInterceptor(jwtManager)
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(jwtInterceptor.Unary()))
 	pb.RegisterTweetServiceServer(grpcServer, server)
 
 	listner, err := net.Listen("tcp", ":0")

@@ -39,9 +39,9 @@ func NewPostgresTweetStore(opts *option.PostgresOptions) (*PostgresTweetStore, e
 func (p *PostgresTweetStore) Create(ctx context.Context, userID int64, content string) (int64, error) {
 	query := fmt.Sprintf(`
 		INSERT INTO tweets (content, user_id)
-		VALUES ('%s', '%s')
+		VALUES ('%s', '%d')
 		RETURNING  id`,
-		content, "1",
+		content, userID,
 	)
 	var id int64
 	err := p.db.QueryRowContext(ctx, query).Scan(&id)
@@ -49,10 +49,6 @@ func (p *PostgresTweetStore) Create(ctx context.Context, userID int64, content s
 	if err != nil {
 		return 0, fmt.Errorf("Could not create a record: %v", err)
 	}
-	// id, err := result.RowsAffected()
-	// if err != nil {
-	// 	return 0, fmt.Errorf("Could not get id of the record: %v", err)
-	// }
 
 	return id, nil
 }

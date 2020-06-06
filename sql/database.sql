@@ -8,6 +8,14 @@ CREATE TABLE users(
     hash_password VARCHAR NOT NULL
 );
 
+CREATE TABLE profiles(
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    followee_count INTEGER,
+    follower_count INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
 CREATE TABLE tweets(
     id SERIAL PRIMARY KEY,
     content VARCHAR NOT NULL,

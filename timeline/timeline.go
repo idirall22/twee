@@ -54,12 +54,9 @@ func (s *Server) Timeline(req *pb.TimelineRequest, stream pb.TimelineService_Tim
 		userInfos.ID,
 		req.Type,
 		func(tweet *pb.Tweet) error {
-			for {
-				err = stream.Send(&pb.TimelineResponse{Tweet: tweet})
-
-				if err != nil {
-					return status.Errorf(codes.Internal, "Could not send tweet: %v", err)
-				}
+			err = stream.Send(&pb.TimelineResponse{Tweet: tweet})
+			if err != nil {
+				return status.Errorf(codes.Internal, "Could not send tweet: %v", err)
 			}
 			return nil
 		},

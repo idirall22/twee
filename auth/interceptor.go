@@ -61,6 +61,25 @@ func (i *JwtInterceptor) isAuthorized(ctx context.Context) (*UserClaims, error) 
 	return claims, nil
 }
 
+// Stream interceptor
+func (i *JwtInterceptor) Stream() grpc.StreamServerInterceptor {
+	return func(srv interface{},
+		ss grpc.ServerStream,
+		info *grpc.StreamServerInfo,
+		handler grpc.StreamHandler,
+	) error {
+		claims, err := i.isAuthorized(ss.Context())
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("------------------------------")
+		fmt.Println(claims)
+		fmt.Println("------------------------------")
+		return handler(srv, ss)
+	}
+}
+
 // GetUserInfosFromContext get user claims from context
 func GetUserInfosFromContext(ctx context.Context) (*UserClaims, error) {
 	userInfos, ok := ctx.Value(ClaimKey("claims")).(*UserClaims)
