@@ -6,12 +6,6 @@ option go_package = ".;pb";
 
 import "notification_message.proto";
 
-message NewNotitficationRequest{
-    Notification notification = 1;
-}
-
-message NewNotitficationResponse{}
-
 message NotifyRequest{}
 
 message NotifyResponse{
@@ -21,6 +15,4 @@ message NotifyResponse{
 service NotificationService{
     // Notify by sending stream of notification
     rpc Notify(NotifyRequest)returns(stream NotifyResponse){}
-    // New notification
-    rpc New(NewNotitficationRequest) returns (NewNotitficationResponse){}
 }

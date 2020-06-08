@@ -31,22 +31,22 @@ func NewPostgresNotificationStore(opts *option.PostgresOptions) (*PostgresNotifi
 }
 
 // New create notification
-func (s *PostgresNotificationStore) New(ctx context.Context, notif *pb.Notification) error {
+func (s *PostgresNotificationStore) New(ctx context.Context, nn *pb.NewNotification) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("Could not start a transaction: %v", err)
 	}
 	defer tx.Rollback()
 
-	switch notif.Type {
-	case pb.Notification_TWEET:
+	switch nn.Type {
+	case pb.Type_TWEET:
 		stmt, err := tx.PrepareContext(ctx, `
 			SELECT followee, follower FROM follows WHERE f.followee=$1
 		`)
 		if err != nil {
 			return fmt.Errorf("Could not prepare select followers statment: %v", err)
 		}
-		rows, err := stmt.QueryContext(ctx, notif.GetTweet().GetUserId())
+		rows, err := stmt.QueryContext(ctx, nn.UserOrigin)
 		if err != nil {
 			return fmt.Errorf("Could not query: %v", err)
 		}
@@ -67,19 +67,23 @@ func (s *PostgresNotificationStore) New(ctx context.Context, notif *pb.Notificat
 
 		values := ""
 		for _, id := range ids {
-			values += fmt.Sprintf("('%s', '%s', '%s', %d),",
-				notif.Type,
-				notif.Title,
-				notif.Description,
+			values += fmt.Sprintf("(%d, '%s', %d, '%s', %d, %v),",
+				nn.UserOrigin,
+				nn.Type,
+				nn.TypeId,
+				nn.Title,
 				id,
+				nn.Opened,
 			)
 		}
-
 		values = strings.TrimRight(values, ",")
 
 		stmt, err = tx.PrepareContext(ctx, `
-			INSERT INTO notifications (type, title, description, user_id ) VALUES($1)
+			INSERT INTO notifications
+			(user_origin, type, type_id, title, user_id, opened)
+			VALUES($1)
 		`)
+
 		if err != nil {
 			return fmt.Errorf("Could not prepare statment: %v", err)
 		}
@@ -112,7 +116,7 @@ func (s *PostgresNotificationStore) List(
 	stmt, err := tx.PrepareContext(
 		ctx,
 		`
-			SELECT data, id, user_id, type, title, description, opened
+			SELECT id, user_origin, type, type_id, title, user_id, opened
 			FROM notifications WHERE user_id=$1
 		`,
 	)
@@ -129,12 +133,12 @@ func (s *PostgresNotificationStore) List(
 	for rows.Next() {
 		n := &pb.Notification{}
 		err = rows.Scan(
-			&n.Data,
 			&n.Id,
-			&n.UserId,
+			&n.UserOrigin,
 			&n.Type,
+			&n.TypeId,
 			&n.Title,
-			&n.Description,
+			&n.UserId,
 			&n.Opened,
 		)
 		if err != nil {

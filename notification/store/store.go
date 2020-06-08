@@ -1,4 +1,4 @@
-package notification
+package store
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 // Store store notification interface.
 type Store interface {
 	// New create notification
-	New(ctx context.Context, notif *pb.Notification) error
+	New(ctx context.Context, notif *pb.NewNotification) error
 	// List notifications
 	List(ctx context.Context, userID int64, found func(n *pb.Notification) error) error
 }

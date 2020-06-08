@@ -93,7 +93,7 @@ func TestCreateTweets(t *testing.T) {
 
 // start tweet server
 func startTweetTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
-	server, err := tweet.NewServer()
+	server, err := tweet.NewTweetServer(common.PostgresTestOptions)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 

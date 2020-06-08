@@ -3,7 +3,8 @@ package tweet
 import (
 	"context"
 	"fmt"
-	"time"
+
+	teventstore "github.com/idirall22/twee/tweet/event_store/stan"
 
 	"github.com/idirall22/twee/auth"
 
@@ -21,28 +22,27 @@ import (
 type Server struct {
 	tweetStore         Store
 	notificationClient *pb.NotificationServiceClient
+	eventStore         EventStore
 }
 
-// NewServer create new tweet server
-func NewServer() (*Server, error) {
-	opts := option.NewPostgresOptions(
-		"0.0.0.0",
-		"postgres",
-		"password",
-		"twee",
-		3,
-		5432,
-		time.Second,
-	)
-
+// NewTweetServer create new tweet server
+func NewTweetServer(opts *option.PostgresOptions) (*Server, error) {
 	pStore, err := postgresstore.NewPostgresTweetStore(opts)
 
 	if err != nil {
 		return nil, fmt.Errorf("Could not Start store: %v", err)
 	}
 
+	es, err := teventstore.NewNatsStreamingEventStore("tweets")
+	if err != nil {
+		return nil, fmt.Errorf("Could not Start event store: %v", err)
+	}
+
+	go es.Start()
+
 	return &Server{
 		tweetStore: pStore,
+		eventStore: es,
 	}, nil
 }
 
@@ -67,6 +67,16 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateTweetRequest) (*pb.Cr
 	res := &pb.CreateTweetResponse{
 		Id: id,
 	}
+
+	n := &pb.NewNotification{
+		Type:       pb.Type_TWEET,
+		UserOrigin: userInfos.ID,
+		TypeId:     id,
+		Title:      fmt.Sprintf("%s has Tweeted", userInfos.Username),
+		Opened:     false,
+	}
+
+	go s.eventStore.Publish(ctx, n)
 
 	return res, nil
 }
