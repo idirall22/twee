@@ -29,17 +29,7 @@ type Server struct {
 }
 
 // NewAuthServer create new auth store
-func NewAuthServer(jwtManager *JwtManager) (*Server, error) {
-	opts := option.NewPostgresOptions(
-		"0.0.0.0",
-		"postgres",
-		"password",
-		"twee",
-		3,
-		5432,
-		time.Second,
-	)
-
+func NewAuthServer(jwtManager *JwtManager, opts *option.PostgresOptions) (*Server, error) {
 	aStore, err := apstore.NewPostgresAuthStore(opts)
 
 	if err != nil {

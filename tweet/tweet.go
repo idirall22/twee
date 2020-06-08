@@ -19,7 +19,8 @@ import (
 
 // Server server
 type Server struct {
-	tweetStore Store
+	tweetStore         Store
+	notificationClient *pb.NotificationServiceClient
 }
 
 // NewServer create new tweet server
@@ -66,6 +67,7 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateTweetRequest) (*pb.Cr
 	res := &pb.CreateTweetResponse{
 		Id: id,
 	}
+
 	return res, nil
 }
 
@@ -134,14 +136,7 @@ func (s *Server) Get(ctx context.Context, req *pb.GetTweetRequest) (*pb.GetTweet
 
 // List a user tweets using user id.
 func (s *Server) List(req *pb.ListTweetRequest, stream pb.TweetService_ListServer) error {
-	// get user infos from context
-	userInfos, err := auth.GetUserInfosFromContext(stream.Context())
-	if err != nil {
-		return status.Errorf(codes.InvalidArgument, err.Error())
-	}
-	page := 1
-
-	tweets, err := s.tweetStore.List(stream.Context(), userInfos.ID, page)
+	tweets, err := s.tweetStore.List(stream.Context(), req.UserId, int(req.Limit))
 	if err != nil {
 		return status.Errorf(codes.Internal, "Could not list tweets: %v", err)
 	}

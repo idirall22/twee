@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = ".;pb";
+
+import "tweet_message.proto";
+import "follow_message.proto";
+
+message Notification{
+    enum Type{
+        UNKNOWNE = 0;
+        TWEET = 1;
+        FOLLOW = 2;
+    }
+    oneof Data{
+        Tweet tweet = 1;
+        Follow follow = 2;
+    }
+    int64 id = 3;
+    int64 user_id = 4;
+    Type type = 5;
+    string title = 6;
+    string description = 7;
+    bool opened = 8;
+}

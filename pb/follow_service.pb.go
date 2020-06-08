@@ -29,61 +29,6 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-type Follow struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Follower int64 `protobuf:"varint,1,opt,name=follower,proto3" json:"follower,omitempty"`
-	Followee int64 `protobuf:"varint,2,opt,name=followee,proto3" json:"followee,omitempty"`
-}
-
-func (x *Follow) Reset() {
-	*x = Follow{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_follow_service_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Follow) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Follow) ProtoMessage() {}
-
-func (x *Follow) ProtoReflect() protoreflect.Message {
-	mi := &file_follow_service_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Follow.ProtoReflect.Descriptor instead.
-func (*Follow) Descriptor() ([]byte, []int) {
-	return file_follow_service_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *Follow) GetFollower() int64 {
-	if x != nil {
-		return x.Follower
-	}
-	return 0
-}
-
-func (x *Follow) GetFollowee() int64 {
-	if x != nil {
-		return x.Followee
-	}
-	return 0
-}
-
 type RequestFollow struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -95,7 +40,7 @@ type RequestFollow struct {
 func (x *RequestFollow) Reset() {
 	*x = RequestFollow{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_follow_service_proto_msgTypes[1]
+		mi := &file_follow_service_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -108,7 +53,7 @@ func (x *RequestFollow) String() string {
 func (*RequestFollow) ProtoMessage() {}
 
 func (x *RequestFollow) ProtoReflect() protoreflect.Message {
-	mi := &file_follow_service_proto_msgTypes[1]
+	mi := &file_follow_service_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -121,7 +66,7 @@ func (x *RequestFollow) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestFollow.ProtoReflect.Descriptor instead.
 func (*RequestFollow) Descriptor() ([]byte, []int) {
-	return file_follow_service_proto_rawDescGZIP(), []int{1}
+	return file_follow_service_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *RequestFollow) GetFollowee() int64 {
@@ -140,7 +85,7 @@ type ResponseFollow struct {
 func (x *ResponseFollow) Reset() {
 	*x = ResponseFollow{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_follow_service_proto_msgTypes[2]
+		mi := &file_follow_service_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -153,7 +98,7 @@ func (x *ResponseFollow) String() string {
 func (*ResponseFollow) ProtoMessage() {}
 
 func (x *ResponseFollow) ProtoReflect() protoreflect.Message {
-	mi := &file_follow_service_proto_msgTypes[2]
+	mi := &file_follow_service_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -166,28 +111,24 @@ func (x *ResponseFollow) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseFollow.ProtoReflect.Descriptor instead.
 func (*ResponseFollow) Descriptor() ([]byte, []int) {
-	return file_follow_service_proto_rawDescGZIP(), []int{2}
+	return file_follow_service_proto_rawDescGZIP(), []int{1}
 }
 
 var File_follow_service_proto protoreflect.FileDescriptor
 
 var file_follow_service_proto_rawDesc = []byte{
 	0x0a, 0x14, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x02, 0x76, 0x31, 0x22, 0x40, 0x0a, 0x06, 0x46, 0x6f,
-	0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72,
-	0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x03, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x22, 0x2b, 0x0a, 0x0d,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x1a, 0x0a,
-	0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52,
-	0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x22, 0x10, 0x0a, 0x0e, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x32, 0x46, 0x0a, 0x0d, 0x46,
-	0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x35, 0x0a, 0x0c,
-	0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x11, 0x2e, 0x76,
-	0x31, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x1a,
-	0x12, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x46, 0x6f, 0x6c,
-	0x6c, 0x6f, 0x77, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x02, 0x76, 0x31, 0x22, 0x2b, 0x0a, 0x0d, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x1a, 0x0a, 0x08, 0x66,
+	0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x66,
+	0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x22, 0x10, 0x0a, 0x0e, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x32, 0x46, 0x0a, 0x0d, 0x46, 0x6f, 0x6c,
+	0x6c, 0x6f, 0x77, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x35, 0x0a, 0x0c, 0x54, 0x6f,
+	0x67, 0x67, 0x6c, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x11, 0x2e, 0x76, 0x31, 0x2e,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x1a, 0x12, 0x2e,
+	0x76, 0x31, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f,
+	0x77, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -202,15 +143,14 @@ func file_follow_service_proto_rawDescGZIP() []byte {
 	return file_follow_service_proto_rawDescData
 }
 
-var file_follow_service_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_follow_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_follow_service_proto_goTypes = []interface{}{
-	(*Follow)(nil),         // 0: v1.Follow
-	(*RequestFollow)(nil),  // 1: v1.RequestFollow
-	(*ResponseFollow)(nil), // 2: v1.ResponseFollow
+	(*RequestFollow)(nil),  // 0: v1.RequestFollow
+	(*ResponseFollow)(nil), // 1: v1.ResponseFollow
 }
 var file_follow_service_proto_depIdxs = []int32{
-	1, // 0: v1.FollowService.ToggleFollow:input_type -> v1.RequestFollow
-	2, // 1: v1.FollowService.ToggleFollow:output_type -> v1.ResponseFollow
+	0, // 0: v1.FollowService.ToggleFollow:input_type -> v1.RequestFollow
+	1, // 1: v1.FollowService.ToggleFollow:output_type -> v1.ResponseFollow
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -225,18 +165,6 @@ func file_follow_service_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_follow_service_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Follow); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_follow_service_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RequestFollow); i {
 			case 0:
 				return &v.state
@@ -248,7 +176,7 @@ func file_follow_service_proto_init() {
 				return nil
 			}
 		}
-		file_follow_service_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_follow_service_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ResponseFollow); i {
 			case 0:
 				return &v.state
@@ -267,7 +195,7 @@ func file_follow_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_follow_service_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

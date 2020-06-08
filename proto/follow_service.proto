@@ -4,11 +4,6 @@ package v1;
 
 option go_package = ".;pb";
 
-message Follow{
-    int64 follower = 1;
-    int64 followee = 2;
-}
-
 message RequestFollow{
     int64 followee = 1;
 }

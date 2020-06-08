@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/idirall22/twee/common"
+
 	sample "github.com/idirall22/twee/generator"
 
 	"github.com/idirall22/twee/auth"
@@ -22,6 +24,7 @@ func TestFollow(t *testing.T) {
 		time.Minute*15,
 		time.Hour*24*365,
 	)
+
 	followAddr := startFollowTestServer(t, jwtManager)
 	followClient := startFollowClient(t, followAddr)
 
@@ -100,7 +103,7 @@ func startFollowClient(t *testing.T, address string) pb.FollowServiceClient {
 
 // start auth server
 func startAuthTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
-	server, err := auth.NewAuthServer(jwtManager)
+	server, err := auth.NewAuthServer(jwtManager, common.PostgresTestOptions)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 

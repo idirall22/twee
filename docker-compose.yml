@@ -9,5 +9,10 @@ services:
             POSTGRES_PASSWORD: password
         volumes: 
             - ./sql/:/docker-entrypoint-initdb.d/
-    
-        
+    nats:
+        image: nats-streaming
+        restart: always
+        ports:
+            - 4222:4222
+            - 6222:6222
+            - 8222:8222

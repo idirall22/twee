@@ -73,9 +73,17 @@ func (i *JwtInterceptor) Stream() grpc.StreamServerInterceptor {
 			return err
 		}
 
-		fmt.Println("------------------------------")
-		fmt.Println(claims)
-		fmt.Println("------------------------------")
+		ctx := context.WithValue(ss.Context(), ClaimKey("claims"), claims)
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			return fmt.Errorf("Could not add user claims to context")
+		}
+
+		err = ss.SetHeader(md)
+		if err != nil {
+			return fmt.Errorf("Could not set header: %v", err)
+		}
+
 		return handler(srv, ss)
 	}
 }

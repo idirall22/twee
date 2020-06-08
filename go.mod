@@ -11,6 +11,8 @@ require (
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.3.0 // indirect
 	github.com/lib/pq v1.6.0
+	github.com/nats-io/nats.go v1.9.1
+	github.com/nats-io/stan.go v0.6.0
 	github.com/stretchr/testify v1.4.0
 	go.uber.org/zap v1.15.0
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37

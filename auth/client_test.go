@@ -2,12 +2,12 @@ package auth_test
 
 import (
 	"context"
-	"log"
 	"net"
 	"testing"
 	"time"
 
 	sample "github.com/idirall22/twee/generator"
+	option "github.com/idirall22/twee/options"
 	"github.com/idirall22/twee/pb"
 
 	"github.com/idirall22/twee/auth"
@@ -22,21 +22,37 @@ func TestAuthService(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	log.Println("Server running on: ", addr)
+	// Register
 	reqReg := sample.RandomRegisterRequest()
 	resReg, err := client.Register(ctx, reqReg)
 	require.NoError(t, err)
 	require.NotNil(t, resReg)
 
+	// Login
 	reqLogin := sample.LoginRequestFromRegisterRequest(reqReg)
 	resLog, err := client.Login(ctx, reqLogin)
 	require.NoError(t, err)
 	require.NotNil(t, resLog)
+	require.NotEmpty(t, resLog.AccessToken)
 }
 
 // start auth server
 func startAuthTestServer(t *testing.T) string {
-	server, err := auth.NewAuthServer()
+	opts := option.NewPostgresOptions(
+		"0.0.0.0",
+		"postgres",
+		"password",
+		"twee",
+		3,
+		5432,
+		time.Second,
+	)
+	jwtManager := auth.NewJwtManager(
+		"secret",
+		time.Minute*15,
+		time.Hour*24*365,
+	)
+	server, err := auth.NewAuthServer(jwtManager, opts)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 
