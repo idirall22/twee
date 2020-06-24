@@ -4,7 +4,22 @@ package v1;
 
 option go_package = ".;pb";
 
+import "action_message.proto";
+
+enum FollowListType{
+    FOLLOWER = 0;
+    FOLLOWEE = 1;
+}
+
 message Follow{
-    int64 follower = 1;
+    int64 id = 1;
+    int64 follower = 2;
+    int64 followee = 3;
+}
+
+
+message FollowEvent{
+    Action action = 1;
     int64 followee = 2;
+    int64 follower = 3;
 }

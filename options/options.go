@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// ServiceOption interface
+type ServiceOption interface{}
+
 // PostgresOptions struct
 type PostgresOptions struct {
 	host            string

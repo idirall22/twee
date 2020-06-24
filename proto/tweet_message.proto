@@ -5,10 +5,18 @@ package v1;
 option go_package = ".;pb";
 
 import "google/protobuf/timestamp.proto";
+import "action_message.proto";
 
 message Tweet{
     int64 id = 1;
     string content = 2;
     string user_id = 3;
     google.protobuf.Timestamp created_at = 4;
+}
+
+message TweetEvent{
+    Action action = 1;
+    int64 tweet_id = 2;
+    int64 user_id= 3;
+    string title= 4;
 }

@@ -6,16 +6,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/idirall22/twee/common"
-
-	sample "github.com/idirall22/twee/generator"
-
-	"github.com/idirall22/twee/auth"
-	"github.com/idirall22/twee/follow"
-	"github.com/idirall22/twee/pb"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/idirall22/twee/auth"
+	"github.com/idirall22/twee/common"
+	"github.com/idirall22/twee/follow"
+	feventstore "github.com/idirall22/twee/follow/event_store/stan"
+	fpostgresstore "github.com/idirall22/twee/follow/store/postgres"
+	sample "github.com/idirall22/twee/generator"
+	"github.com/idirall22/twee/pb"
 )
 
 func TestFollow(t *testing.T) {
@@ -70,14 +71,33 @@ func TestFollow(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resFollow)
 
-	resFollow, err = followClient.ToggleFollow(ctx, &pb.RequestFollow{Followee: userClaims.ID})
+	resListFollow, err := followClient.ListFollow(ctx, &pb.RequestListFollow{
+		Followee:   userClaims.ID,
+		FollowType: pb.FollowListType_FOLLOWEE,
+	})
 	require.NoError(t, err)
-	require.NotNil(t, resFollow)
+	require.NotNil(t, resListFollow)
+
+	// resFollow, err = followClient.ToggleFollow(ctx, &pb.RequestFollow{Followee: userClaims.ID})
+	// require.NoError(t, err)
+	// require.NotNil(t, resFollow)
 }
 
 // start auth server
 func startFollowTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
-	server, err := follow.NewFollowServer()
+	pStore, err := fpostgresstore.NewPostgresFollowStore(common.PostgresTestOptions)
+	require.NoError(t, err)
+	require.NotNil(t, pStore)
+
+	es, err := feventstore.NewNatsStreamingEventStore(
+		"tweets",
+		"test-cluster",
+		"0111",
+	)
+	require.NoError(t, err)
+	require.NotNil(t, es)
+
+	server, err := follow.NewFollowServer(pStore, es)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 

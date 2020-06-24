@@ -4,19 +4,7 @@ package v1;
 
 option go_package = ".;pb";
 
-enum Type{
-    UNKNOWNE = 0;
-    TWEET = 1;
-    FOLLOW = 2;
-}
-
-message NewNotification{
-    Type type = 1;
-    int64 user_origin = 2;
-    int64 type_id = 3;
-    string title = 4;
-    bool opened = 5;
-}
+import "type_message.proto";
 
 message Notification{
     int64 id = 1;

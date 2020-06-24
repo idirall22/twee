@@ -1,9 +1,11 @@
-package tlstore
+package tlpostgresstore
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -35,7 +37,8 @@ func NewPostgresTimelineStore(opts *option.PostgresOptions) (*PostgresTimelineSt
 func (s *PostgresTimelineStore) List(
 	ctx context.Context,
 	userID int64,
-	self bool,
+	followList []*pb.Follow,
+	timelineType pb.TimelineType,
 	found func(tm *pb.Tweet) error,
 ) error {
 
@@ -46,76 +49,47 @@ func (s *PostgresTimelineStore) List(
 
 	defer tx.Rollback()
 
-	var stmt *sql.Stmt
-
-	if self {
-		stmt, err = tx.PrepareContext(
-			ctx,
-			`
-				SELECT * FROM tweets WHERE user_id=$1 LIMIT $2 OFFSET $3
-			`,
-		)
-		if err != nil {
-			return fmt.Errorf("Could not prempare statment: %v", err)
-		}
-	} else {
-		stmt, err = tx.PrepareContext(
-			ctx,
-			`
-				SELECT f.followee, f.follower, t.id, t.user_id, t.content
-				FROM follows AS f INNER JOIN tweets AS t
-				ON f.follower=$1
-			`,
-		)
-		if err != nil {
-			return fmt.Errorf("Could not prempare statment: %v", err)
-		}
+	usersString := strconv.FormatInt(userID, 10)
+	query := "SELECT * FROM tweets WHERE user_id IN ($1)"
+	if timelineType == pb.TimelineType_HOME {
+		usersString = getFolloweeString(usersString, followList)
 	}
 
-	rows, err := stmt.QueryContext(ctx, userID)
+	stmt, err := tx.PrepareContext(ctx, query)
+	if err != nil {
+		return fmt.Errorf("Could not prepare statment: %v", err)
+	}
+
+	rows, err := stmt.QueryContext(ctx, usersString)
 	if err != nil {
 		return fmt.Errorf("Could not Query timeline tweets: %v", err)
 	}
 
 	defer rows.Close()
 
-	if self {
-		for rows.Next() {
-			tweet := &pb.Tweet{}
-			var t time.Time
-			rows.Scan(
-				&tweet.Id,
-				&tweet.UserId,
-				&tweet.Content,
-				&t,
-			)
-			tweet.CreatedAt, _ = ptypes.TimestampProto(t)
-			err = found(tweet)
-			if err != nil {
-				return fmt.Errorf("Could not send tweet: %v", err)
-			}
-		}
-	} else {
-		var followee int
-		var follower int
-		for rows.Next() {
-			tweet := &pb.Tweet{}
-			var t time.Time
-			rows.Scan(
-				&followee,
-				&follower,
-				&tweet.Id,
-				&tweet.UserId,
-				&tweet.Content,
-				&t,
-			)
-			tweet.CreatedAt, _ = ptypes.TimestampProto(t)
-			err = found(tweet)
-			if err != nil {
-				return fmt.Errorf("Could not send tweet: %v", err)
-			}
+	for rows.Next() {
+		tweet := &pb.Tweet{}
+		var t time.Time
+		rows.Scan(
+			&tweet.Id,
+			&tweet.UserId,
+			&tweet.Content,
+			&t,
+		)
+		tweet.CreatedAt, _ = ptypes.TimestampProto(t)
+		err = found(tweet)
+		if err != nil {
+			return fmt.Errorf("Could not send tweet: %v", err)
 		}
 	}
-
 	return nil
+}
+
+func getFolloweeString(in string, followList []*pb.Follow) string {
+	out := in + ","
+	for _, f := range followList {
+		out += strconv.FormatInt(f.Followee, 10) + ","
+	}
+	out = strings.TrimRight(out, ",")
+	return out
 }

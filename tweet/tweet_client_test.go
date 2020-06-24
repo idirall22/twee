@@ -8,6 +8,10 @@ import (
 	"testing"
 	"time"
 
+	teventstore "github.com/idirall22/twee/tweet/event_store/stan"
+
+	postgresstore "github.com/idirall22/twee/tweet/store/postgres"
+
 	"google.golang.org/grpc/metadata"
 
 	"github.com/idirall22/twee/auth"
@@ -83,17 +87,30 @@ func TestCreateTweets(t *testing.T) {
 		require.NotNil(t, res)
 	}
 
-	// Delete tweets
-	for _, tweetId := range createdIds {
-		reqDel := sample.NewRequestDeleteTweet(tweetId)
-		_, err = tweetClient.Delete(ctx, reqDel)
-		require.NoError(t, err)
-	}
+	// // Delete tweets
+	// for _, tweetId := range createdIds {
+	// 	reqDel := sample.NewRequestDeleteTweet(tweetId)
+	// 	_, err = tweetClient.Delete(ctx, reqDel)
+	// 	require.NoError(t, err)
+	// }
+
 }
 
 // start tweet server
 func startTweetTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
-	server, err := tweet.NewTweetServer(common.PostgresTestOptions)
+	pStore, err := postgresstore.NewPostgresTweetStore(common.PostgresTestOptions)
+	require.NoError(t, err)
+	require.NotNil(t, pStore)
+
+	es, err := teventstore.NewNatsStreamingEventStore(
+		"tweets",
+		"test-cluster",
+		"0111",
+	)
+	require.NoError(t, err)
+	require.NotNil(t, pStore)
+
+	server, err := tweet.NewTweetServer(pStore, es)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 

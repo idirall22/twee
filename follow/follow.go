@@ -3,41 +3,38 @@ package follow
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"github.com/idirall22/twee/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	fstore "github.com/idirall22/twee/follow/store/postgres"
-	option "github.com/idirall22/twee/options"
+	"github.com/idirall22/twee/auth"
+	eventstore "github.com/idirall22/twee/follow/event_store"
+	"github.com/idirall22/twee/follow/store"
 	"github.com/idirall22/twee/pb"
 )
 
 // Server follow service struct.
 type Server struct {
-	followStore *fstore.PostgresFollowStore
+	followStore        store.FollowStore
+	notificationClient *pb.NotificationServiceClient
+	eventStore         eventstore.EventStore
 }
 
 // NewFollowServer create new follow service.
-func NewFollowServer() (*Server, error) {
-	opts := option.NewPostgresOptions(
-		"0.0.0.0",
-		"postgres",
-		"password",
-		"twee",
-		3,
-		5432,
-		time.Second,
-	)
-
-	followStore, err := fstore.NewPostgresFollowStore(opts)
-
-	if err != nil {
-		return nil, fmt.Errorf("Could not Start store: %v", err)
+func NewFollowServer(s store.FollowStore, es eventstore.EventStore) (*Server, error) {
+	if s == nil {
+		return nil, fmt.Errorf("Store should not be NIL")
 	}
+
+	// if es == nil {
+	// 	return nil, fmt.Errorf("Event Store should not be NIL")
+	// }
+
+	// go es.Start()
+
 	return &Server{
-		followStore: followStore,
+		followStore: s,
+		eventStore:  es,
 	}, nil
 }
 
@@ -49,10 +46,34 @@ func (s *Server) ToggleFollow(ctx context.Context, req *pb.RequestFollow) (*pb.R
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	err = s.followStore.ToggleFollow(ctx, userInfos.ID, req.Followee)
+	followee := req.Followee
+	follower := userInfos.ID
+	_, err = s.followStore.ToggleFollow(ctx, follower, followee)
+
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not Follow: %v", err)
+		return nil, status.Errorf(codes.Internal, "Could not toggle follow: %v", err)
 	}
 
+	// publish follow event.
+	// go s.eventStore.Publish(ctx, &pb.FollowEvent{
+	// 	Action:   action,
+	// 	Followee: followee,
+	// 	Follower: follower,
+	// })
+
 	return &pb.ResponseFollow{}, nil
+}
+
+// ListFollow list followee or followers
+func (s *Server) ListFollow(ctx context.Context, req *pb.RequestListFollow) (*pb.ResponseListFollow, error) {
+	followsList, err := s.followStore.ListFollow(
+		ctx,
+		req.Followee,
+		req.Follower,
+		req.FollowType,
+	)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Error to list follow: %v", err)
+	}
+	return &pb.ResponseListFollow{Follows: followsList}, nil
 }

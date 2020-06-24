@@ -31,7 +31,11 @@ func NewPostgresNotificationStore(opts *option.PostgresOptions) (*PostgresNotifi
 }
 
 // New create notification
-func (s *PostgresNotificationStore) New(ctx context.Context, nn *pb.NewNotification) error {
+func (s *PostgresNotificationStore) New(
+	ctx context.Context,
+	nn *pb.NewNotification,
+	notifChan chan<- *pb.Notification,
+) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("Could not start a transaction: %v", err)
@@ -41,7 +45,7 @@ func (s *PostgresNotificationStore) New(ctx context.Context, nn *pb.NewNotificat
 	switch nn.Type {
 	case pb.Type_TWEET:
 		stmt, err := tx.PrepareContext(ctx, `
-			SELECT followee, follower FROM follows WHERE f.followee=$1
+			SELECT followee, follower FROM follows WHERE followee=$1
 		`)
 		if err != nil {
 			return fmt.Errorf("Could not prepare select followers statment: %v", err)
@@ -65,6 +69,10 @@ func (s *PostgresNotificationStore) New(ctx context.Context, nn *pb.NewNotificat
 			ids = append(ids, follower)
 		}
 
+		if len(ids) == 0 {
+			return nil
+		}
+
 		values := ""
 		for _, id := range ids {
 			values += fmt.Sprintf("(%d, '%s', %d, '%s', %d, %v),",
@@ -78,19 +86,42 @@ func (s *PostgresNotificationStore) New(ctx context.Context, nn *pb.NewNotificat
 		}
 		values = strings.TrimRight(values, ",")
 
-		stmt, err = tx.PrepareContext(ctx, `
+		query := fmt.Sprintf(`
 			INSERT INTO notifications
-			(user_origin, type, type_id, title, user_id, opened)
-			VALUES($1)
-		`)
+			(user_origin, type, type_id, title, user_id, opened) VALUES %s RETURNING id, user_id`,
+			values,
+		)
+
+		stmt, err = tx.PrepareContext(ctx, query)
 
 		if err != nil {
-			return fmt.Errorf("Could not prepare statment: %v", err)
+			return fmt.Errorf("Could not prepare insert statment: %v", err)
 		}
 
-		_, err = stmt.ExecContext(ctx, values)
+		rows, err = stmt.QueryContext(ctx)
 		if err != nil {
 			return fmt.Errorf("Could not create notifications: %v", err)
+		}
+		defer rows.Close()
+
+		notif := &pb.Notification{
+
+			UserOrigin: nn.UserOrigin,
+			Type:       nn.Type,
+			TypeId:     nn.TypeId,
+			Title:      nn.Title,
+			Opened:     nn.Opened,
+		}
+
+		for rows.Next() {
+			err = rows.Scan(
+				&notif.Id,
+				&notif.UserId,
+			)
+			if err != nil {
+				return fmt.Errorf("Could not scan id: %v", err)
+			}
+			notifChan <- notif
 		}
 
 		err = tx.Commit()

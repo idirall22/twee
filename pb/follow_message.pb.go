@@ -25,13 +25,60 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+type FollowListType int32
+
+const (
+	FollowListType_FOLLOWER FollowListType = 0
+	FollowListType_FOLLOWEE FollowListType = 1
+)
+
+// Enum value maps for FollowListType.
+var (
+	FollowListType_name = map[int32]string{
+		0: "FOLLOWER",
+		1: "FOLLOWEE",
+	}
+	FollowListType_value = map[string]int32{
+		"FOLLOWER": 0,
+		"FOLLOWEE": 1,
+	}
+)
+
+func (x FollowListType) Enum() *FollowListType {
+	p := new(FollowListType)
+	*p = x
+	return p
+}
+
+func (x FollowListType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FollowListType) Descriptor() protoreflect.EnumDescriptor {
+	return file_follow_message_proto_enumTypes[0].Descriptor()
+}
+
+func (FollowListType) Type() protoreflect.EnumType {
+	return &file_follow_message_proto_enumTypes[0]
+}
+
+func (x FollowListType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FollowListType.Descriptor instead.
+func (FollowListType) EnumDescriptor() ([]byte, []int) {
+	return file_follow_message_proto_rawDescGZIP(), []int{0}
+}
+
 type Follow struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Follower int64 `protobuf:"varint,1,opt,name=follower,proto3" json:"follower,omitempty"`
-	Followee int64 `protobuf:"varint,2,opt,name=followee,proto3" json:"followee,omitempty"`
+	Id       int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Follower int64 `protobuf:"varint,2,opt,name=follower,proto3" json:"follower,omitempty"`
+	Followee int64 `protobuf:"varint,3,opt,name=followee,proto3" json:"followee,omitempty"`
 }
 
 func (x *Follow) Reset() {
@@ -66,6 +113,13 @@ func (*Follow) Descriptor() ([]byte, []int) {
 	return file_follow_message_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *Follow) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 func (x *Follow) GetFollower() int64 {
 	if x != nil {
 		return x.Follower
@@ -80,16 +134,91 @@ func (x *Follow) GetFollowee() int64 {
 	return 0
 }
 
+type FollowEvent struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Action   Action `protobuf:"varint,1,opt,name=action,proto3,enum=v1.Action" json:"action,omitempty"`
+	Followee int64  `protobuf:"varint,2,opt,name=followee,proto3" json:"followee,omitempty"`
+	Follower int64  `protobuf:"varint,3,opt,name=follower,proto3" json:"follower,omitempty"`
+}
+
+func (x *FollowEvent) Reset() {
+	*x = FollowEvent{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_follow_message_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FollowEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FollowEvent) ProtoMessage() {}
+
+func (x *FollowEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_follow_message_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FollowEvent.ProtoReflect.Descriptor instead.
+func (*FollowEvent) Descriptor() ([]byte, []int) {
+	return file_follow_message_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *FollowEvent) GetAction() Action {
+	if x != nil {
+		return x.Action
+	}
+	return Action_UNKNOWNE_ACTION
+}
+
+func (x *FollowEvent) GetFollowee() int64 {
+	if x != nil {
+		return x.Followee
+	}
+	return 0
+}
+
+func (x *FollowEvent) GetFollower() int64 {
+	if x != nil {
+		return x.Follower
+	}
+	return 0
+}
+
 var File_follow_message_proto protoreflect.FileDescriptor
 
 var file_follow_message_proto_rawDesc = []byte{
 	0x0a, 0x14, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x02, 0x76, 0x31, 0x22, 0x40, 0x0a, 0x06, 0x46, 0x6f,
-	0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72,
-	0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x03, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x42, 0x06, 0x5a, 0x04,
-	0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x02, 0x76, 0x31, 0x1a, 0x14, 0x61, 0x63, 0x74, 0x69,
+	0x6f, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x22, 0x50, 0x0a, 0x06, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f,
+	0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x66, 0x6f,
+	0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77,
+	0x65, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77,
+	0x65, 0x65, 0x22, 0x69, 0x0a, 0x0b, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x45, 0x76, 0x65, 0x6e,
+	0x74, 0x12, 0x22, 0x0a, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0e, 0x32, 0x0a, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x06, 0x61,
+	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65,
+	0x65, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x2a, 0x2c, 0x0a,
+	0x0e, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x79, 0x70, 0x65, 0x12,
+	0x0c, 0x0a, 0x08, 0x46, 0x4f, 0x4c, 0x4c, 0x4f, 0x57, 0x45, 0x52, 0x10, 0x00, 0x12, 0x0c, 0x0a,
+	0x08, 0x46, 0x4f, 0x4c, 0x4c, 0x4f, 0x57, 0x45, 0x45, 0x10, 0x01, 0x42, 0x06, 0x5a, 0x04, 0x2e,
+	0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -104,16 +233,21 @@ func file_follow_message_proto_rawDescGZIP() []byte {
 	return file_follow_message_proto_rawDescData
 }
 
-var file_follow_message_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_follow_message_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_follow_message_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_follow_message_proto_goTypes = []interface{}{
-	(*Follow)(nil), // 0: v1.Follow
+	(FollowListType)(0), // 0: v1.FollowListType
+	(*Follow)(nil),      // 1: v1.Follow
+	(*FollowEvent)(nil), // 2: v1.FollowEvent
+	(Action)(0),         // 3: v1.Action
 }
 var file_follow_message_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3, // 0: v1.FollowEvent.action:type_name -> v1.Action
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_follow_message_proto_init() }
@@ -121,9 +255,22 @@ func file_follow_message_proto_init() {
 	if File_follow_message_proto != nil {
 		return
 	}
+	file_action_message_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_follow_message_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Follow); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_follow_message_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FollowEvent); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -140,13 +287,14 @@ func file_follow_message_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_follow_message_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   1,
+			NumEnums:      1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_follow_message_proto_goTypes,
 		DependencyIndexes: file_follow_message_proto_depIdxs,
+		EnumInfos:         file_follow_message_proto_enumTypes,
 		MessageInfos:      file_follow_message_proto_msgTypes,
 	}.Build()
 	File_follow_message_proto = out.File

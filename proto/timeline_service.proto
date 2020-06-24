@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = ".;pb";
+
+import "timeline_message.proto";
+import "tweet_message.proto";
+
+message TimelineRequest{
+    TimelineType type = 1;
+    int64 user_id = 2;
+}
+
+message TimelineResponse{
+    Tweet tweet = 1;
+}
+
+// Timeline service
+service TimelineService{
+    // timeline
+    rpc Timeline(TimelineRequest) returns (stream TimelineResponse);
+}
+

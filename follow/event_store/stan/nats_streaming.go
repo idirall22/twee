@@ -1,4 +1,4 @@
-package teventstore
+package feventstore
 
 import (
 	"context"
@@ -11,9 +11,9 @@ import (
 
 // NatsStreamingEventStore event store.
 type NatsStreamingEventStore struct {
-	cc          stan.Conn
-	subject     string
-	tweetEvents chan *pb.TweetEvent
+	cc           stan.Conn
+	subject      string
+	followEvents chan *pb.FollowEvent
 }
 
 // NewNatsStreamingEventStore create new stan event store.
@@ -24,9 +24,9 @@ func NewNatsStreamingEventStore(subject, clusterID, clientID string, option ...s
 	}
 
 	return &NatsStreamingEventStore{
-		cc:          sc,
-		subject:     subject,
-		tweetEvents: make(chan *pb.TweetEvent, 128),
+		cc:           sc,
+		subject:      subject,
+		followEvents: make(chan *pb.FollowEvent, 128),
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func NewNatsStreamingEventStore(subject, clusterID, clientID string, option ...s
 func (e *NatsStreamingEventStore) Start() error {
 	for {
 		select {
-		case n := <-e.tweetEvents:
+		case n := <-e.followEvents:
 			data, err := common.ProtobufToJSON(n)
 			if err != nil {
 				return fmt.Errorf("Could not serialize data to json: %v", err)
@@ -48,8 +48,8 @@ func (e *NatsStreamingEventStore) Start() error {
 }
 
 // Publish to event store
-func (e *NatsStreamingEventStore) Publish(ctx context.Context, te *pb.TweetEvent) error {
-	e.tweetEvents <- te
+func (e *NatsStreamingEventStore) Publish(ctx context.Context, te *pb.FollowEvent) error {
+	e.followEvents <- te
 	return nil
 }
 

@@ -21,3 +21,7 @@ test-user:
 
 test-tweet:
 	cd tweet/ && go test -v ./...	
+
+test-notification:
+	go clean -testcache
+	cd notification/ && go test -v ./...	

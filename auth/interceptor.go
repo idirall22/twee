@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"google.golang.org/grpc"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 )
 
 // ClaimKey used as a key context
@@ -36,29 +37,9 @@ func (i *JwtInterceptor) Unary() grpc.UnaryServerInterceptor {
 		if err != nil {
 			return nil, err
 		}
-
 		ctx = context.WithValue(ctx, ClaimKey("claims"), claims)
 		return handler(ctx, req)
 	}
-}
-
-func (i *JwtInterceptor) isAuthorized(ctx context.Context) (*UserClaims, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
-	}
-
-	values := md["authorization"]
-	if len(values) == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated token not provided")
-	}
-	accessToken := values[0]
-	claims, err := i.jwtManager.Verify(accessToken)
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "access token not valid")
-	}
-
-	return claims, nil
 }
 
 // Stream interceptor
@@ -68,23 +49,14 @@ func (i *JwtInterceptor) Stream() grpc.StreamServerInterceptor {
 		info *grpc.StreamServerInfo,
 		handler grpc.StreamHandler,
 	) error {
-		claims, err := i.isAuthorized(ss.Context())
+		ctx := ss.Context()
+		claims, err := i.isAuthorized(ctx)
 		if err != nil {
 			return err
 		}
-
-		ctx := context.WithValue(ss.Context(), ClaimKey("claims"), claims)
-		md, ok := metadata.FromIncomingContext(ctx)
-		if !ok {
-			return fmt.Errorf("Could not add user claims to context")
-		}
-
-		err = ss.SetHeader(md)
-		if err != nil {
-			return fmt.Errorf("Could not set header: %v", err)
-		}
-
-		return handler(srv, ss)
+		newStream := grpc_middleware.WrapServerStream(ss)
+		newStream.WrappedContext = context.WithValue(ctx, ClaimKey("claims"), claims)
+		return handler(srv, newStream)
 	}
 }
 
@@ -95,4 +67,30 @@ func GetUserInfosFromContext(ctx context.Context) (*UserClaims, error) {
 		return nil, fmt.Errorf("could not parse user claim data")
 	}
 	return userInfos, nil
+}
+
+func (i *JwtInterceptor) isAuthorized(ctx context.Context) (*UserClaims, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+	}
+	values := md[AuthKey]
+	if len(values) == 0 {
+		userInfos, ok := ctx.Value(ClaimKey("claims")).(*UserClaims)
+		fmt.Println(userInfos, ok)
+		if ok {
+			return userInfos, nil
+		}
+		return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated token not provided")
+	}
+
+	accessToken := values[0]
+	claims, err := i.jwtManager.Verify(accessToken)
+	claims.Token = accessToken
+
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "access token not valid")
+	}
+
+	return claims, nil
 }

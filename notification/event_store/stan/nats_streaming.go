@@ -3,7 +3,6 @@ package neventstore
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/idirall22/twee/pb"
@@ -23,12 +22,13 @@ type NatsStreamingEventStore struct {
 	cc                stan.Conn
 	subject           string
 	newNotifications  chan string
+	notifications     chan *pb.Notification
 	done              chan error
 }
 
 // NewNatsStreamingEventStore create new NatsStreamingEventStore.
 func NewNatsStreamingEventStore(subject string, opts *option.PostgresOptions) (*NatsStreamingEventStore, error) {
-	cc, err := stan.Connect("test-cluster", "test-cluster")
+	cc, err := stan.Connect("test-cluster", "test-cluster-01")
 	if err != nil {
 		return nil, fmt.Errorf("Could not connect to nats streaming server: %v", err)
 	}
@@ -37,7 +37,6 @@ func NewNatsStreamingEventStore(subject string, opts *option.PostgresOptions) (*
 	if err != nil {
 		return nil, fmt.Errorf("Could not create notification store: %v", err)
 	}
-
 	return &NatsStreamingEventStore{
 		notificationStore: ns,
 		subject:           subject,
@@ -47,7 +46,7 @@ func NewNatsStreamingEventStore(subject string, opts *option.PostgresOptions) (*
 }
 
 // Start NatsStreamingEventStore.
-func (e *NatsStreamingEventStore) Start(subject string) error {
+func (e *NatsStreamingEventStore) Start() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
@@ -61,32 +60,37 @@ func (e *NatsStreamingEventStore) Start(subject string) error {
 				err := common.JSONToProtobufMessage(msg, nn)
 				if err != nil {
 					e.done <- fmt.Errorf("Could not parse json: %v", err)
+					break
 				}
 
-				err = e.notificationStore.New(ctx, nn)
+				err = e.notificationStore.New(ctx, nn, e.notifications)
 				if err != nil {
 					e.done <- fmt.Errorf("Could not create notifications: %v", err)
+					break
 				}
-
 			}
 		}
 	}()
 
 	sub, err := e.cc.Subscribe(e.subject, func(msg *stan.Msg) {
 		e.newNotifications <- string(msg.Data)
-		log.Println(string(msg.Data))
 	}, stan.DeliverAllAvailable())
 
 	if err != nil {
 		return fmt.Errorf("Could not subscribe to nats: %v", err)
 	}
+
 	defer sub.Close()
 
-	<-e.done
-	return nil
+	return <-e.done
 }
 
 // Close close
 func (e *NatsStreamingEventStore) Close() error {
 	return e.cc.Close()
+}
+
+// Subscribe get notification channel
+func (e *NatsStreamingEventStore) Subscribe() <-chan *pb.Notification {
+	return e.notifications
 }

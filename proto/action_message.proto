@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = ".;pb";
+
+enum Action{
+    UNKNOWNE_ACTION = 0;
+    CREATED = 1;
+    UPDATED = 2;
+    DELETED = 3;
+}

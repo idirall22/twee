@@ -4,19 +4,11 @@ package v1;
 
 option go_package = ".;pb";
 
-import "tweet_message.proto";
 
-message TimelineRequest{
-    bool type = 1;
+enum TimelineType{
+    OWNER = 0;
+    HOME = 1;
 }
 
-message TimelineResponse{
-    Tweet tweet = 1;
-}
-
-// Timeline service
-service TimelineService{
-    // timeline
-    rpc Timeline(TimelineRequest) returns (stream TimelineResponse);
-}
+message Timeline{}
 

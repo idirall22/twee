@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	teventstore "github.com/idirall22/twee/tweet/event_store/stan"
+	eventstore "github.com/idirall22/twee/tweet/event_store"
+	"github.com/idirall22/twee/tweet/store"
 
 	"github.com/idirall22/twee/auth"
 
@@ -13,35 +14,30 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	option "github.com/idirall22/twee/options"
 	"github.com/idirall22/twee/pb"
-	postgresstore "github.com/idirall22/twee/tweet/store/postgres"
 )
 
 // Server server
 type Server struct {
-	tweetStore         Store
+	tweetStore         store.Store
 	notificationClient *pb.NotificationServiceClient
-	eventStore         EventStore
+	eventStore         eventstore.EventStore
 }
 
 // NewTweetServer create new tweet server
-func NewTweetServer(opts *option.PostgresOptions) (*Server, error) {
-	pStore, err := postgresstore.NewPostgresTweetStore(opts)
-
-	if err != nil {
-		return nil, fmt.Errorf("Could not Start store: %v", err)
+func NewTweetServer(s store.Store, es eventstore.EventStore) (*Server, error) {
+	if s == nil {
+		return nil, fmt.Errorf("Store should not be NIL")
 	}
 
-	es, err := teventstore.NewNatsStreamingEventStore("tweets")
-	if err != nil {
-		return nil, fmt.Errorf("Could not Start event store: %v", err)
-	}
+	// if es == nil {
+	// 	return nil, fmt.Errorf("Event Store should not be NIL")
+	// }
 
-	go es.Start()
+	// go es.Start()
 
 	return &Server{
-		tweetStore: pStore,
+		tweetStore: s,
 		eventStore: es,
 	}, nil
 }
@@ -59,7 +55,10 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateTweetRequest) (*pb.Cr
 		return nil, status.Errorf(codes.InvalidArgument, "tweet Content is empty")
 	}
 
-	id, err := s.tweetStore.Create(ctx, userInfos.ID, content)
+	userID := userInfos.ID
+	// username := userInfos.Username
+
+	id, err := s.tweetStore.Create(ctx, userID, content)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Error to create a tweet: %v", err)
 	}
@@ -68,15 +67,16 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateTweetRequest) (*pb.Cr
 		Id: id,
 	}
 
-	n := &pb.NewNotification{
-		Type:       pb.Type_TWEET,
-		UserOrigin: userInfos.ID,
-		TypeId:     id,
-		Title:      fmt.Sprintf("%s has Tweeted", userInfos.Username),
-		Opened:     false,
-	}
+	// e := &pb.TweetEvent{
+	// 	Action:  pb.Action_CREATED,
+	// 	Title:   fmt.Sprintf("%s has just tweeted", username),
+	// 	TweetId: id,
+	// 	UserId:  userID,
+	// }
 
-	go s.eventStore.Publish(ctx, n)
+	// go func() {
+	// 	s.eventStore.Publish(ctx, e)
+	// }()
 
 	return res, nil
 }

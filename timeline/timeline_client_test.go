@@ -9,18 +9,20 @@ import (
 	"testing"
 	"time"
 
-	sample "github.com/idirall22/twee/generator"
-
-	"github.com/idirall22/twee/tweet"
-
-	"github.com/idirall22/twee/follow"
-	"github.com/idirall22/twee/timeline"
-
-	"github.com/idirall22/twee/auth"
-	"github.com/idirall22/twee/pb"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/idirall22/twee/auth"
+	"github.com/idirall22/twee/common"
+	"github.com/idirall22/twee/follow"
+	fpostgresstore "github.com/idirall22/twee/follow/store/postgres"
+	sample "github.com/idirall22/twee/generator"
+	"github.com/idirall22/twee/pb"
+	"github.com/idirall22/twee/timeline"
+	tlpostgresstore "github.com/idirall22/twee/timeline/store/postgres"
+	"github.com/idirall22/twee/tweet"
+	postgresstore "github.com/idirall22/twee/tweet/store/postgres"
 )
 
 func init() {
@@ -47,7 +49,7 @@ func TestTimeline(t *testing.T) {
 	tweetClient := startTweetClient(t, tAddr)
 
 	// starting timeline server
-	tmAddr := startTimelineTestServer(t, jwtManager)
+	tmAddr := startTimelineTestServer(t, jwtManager, followClient)
 	timelineClient := startTimelineClient(t, tmAddr)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
@@ -77,8 +79,7 @@ func TestTimeline(t *testing.T) {
 	}
 
 	for i, f := range follow {
-		token := accessTokens[i]
-		uctx := metadata.AppendToOutgoingContext(context.Background(), auth.AuthKey, token)
+		uctx := metadata.AppendToOutgoingContext(context.Background(), auth.AuthKey, accessTokens[i])
 
 		for _, id := range f.followees {
 			req := &pb.RequestFollow{Followee: id}
@@ -95,9 +96,19 @@ func TestTimeline(t *testing.T) {
 		}
 
 	}
-	uctx := metadata.AppendToOutgoingContext(context.Background(), auth.AuthKey, accessTokens[0])
 
-	stream, err := timelineClient.Timeline(uctx, &pb.TimelineRequest{Type: true})
+	uctx := metadata.AppendToOutgoingContext(
+		context.Background(), auth.AuthKey, accessTokens[0])
+	// userInfos, err := auth.GetUserInfosFromContext(uctx)
+	// require.NoError(t, err)
+	// require.NotNil(t, userInfos)
+
+	stream, err := timelineClient.Timeline(
+		uctx,
+		&pb.TimelineRequest{
+			Type:   pb.TimelineType_HOME,
+			UserId: 1,
+		})
 	require.NoError(t, err)
 	require.NotNil(t, stream)
 
@@ -110,13 +121,22 @@ func TestTimeline(t *testing.T) {
 			log.Fatalf("Error to fetch user timeline: %v", err)
 		}
 		require.NotNil(t, resTimeline)
-		log.Println(resTimeline.Tweet.Id)
+		log.Println(resTimeline.Tweet.Id, resTimeline.Tweet.UserId)
 	}
 }
 
 // start auth server
-func startTimelineTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
-	server, err := timeline.NewTimelineServer()
+func startTimelineTestServer(
+	t *testing.T,
+	jwtManager *auth.JwtManager,
+	fc pb.FollowServiceClient,
+) string {
+
+	pStore, err := tlpostgresstore.NewPostgresTimelineStore(common.PostgresTestOptions)
+	require.NoError(t, err)
+	require.NotNil(t, pStore)
+
+	server, err := timeline.NewTimelineServer(pStore, nil, fc)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 
@@ -145,12 +165,19 @@ func startTimelineClient(t *testing.T, address string) pb.TimelineServiceClient 
 
 // start auth server
 func startFollowTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
-	server, err := follow.NewFollowServer()
+	pStore, err := fpostgresstore.NewPostgresFollowStore(common.PostgresTestOptions)
+	require.NoError(t, err)
+	require.NotNil(t, pStore)
+
+	server, err := follow.NewFollowServer(pStore, nil)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 
 	jwtInterceptor := auth.NewJwtInterceptor(jwtManager)
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(jwtInterceptor.Unary()))
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(jwtInterceptor.Unary()),
+		grpc.StreamInterceptor(jwtInterceptor.Stream()),
+	)
 	pb.RegisterFollowServiceServer(grpcServer, server)
 
 	listner, err := net.Listen("tcp", ":0")
@@ -171,7 +198,7 @@ func startFollowClient(t *testing.T, address string) pb.FollowServiceClient {
 
 // start auth server
 func startAuthTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
-	server, err := auth.NewAuthServer(jwtManager)
+	server, err := auth.NewAuthServer(jwtManager, common.PostgresTestOptions)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 
@@ -197,7 +224,11 @@ func startAuthClient(t *testing.T, address string) pb.AuthServiceClient {
 
 // start tweet server
 func startTweetTestServer(t *testing.T, jwtManager *auth.JwtManager) string {
-	server, err := tweet.NewServer()
+	pStore, err := postgresstore.NewPostgresTweetStore(common.PostgresTestOptions)
+	require.NoError(t, err)
+	require.NotNil(t, pStore)
+
+	server, err := tweet.NewTweetServer(pStore, nil)
 	require.NoError(t, err)
 	require.NotNil(t, server)
 
@@ -220,4 +251,19 @@ func startTweetClient(t *testing.T, address string) pb.TweetServiceClient {
 	require.NoError(t, err)
 	require.NotNil(t, conn)
 	return pb.NewTweetServiceClient(conn)
+}
+
+func sstream() grpc.StreamClientInterceptor {
+	return func(
+		ctx context.Context,
+		desc *grpc.StreamDesc,
+		cc *grpc.ClientConn,
+		method string,
+		streamer grpc.Streamer,
+		opts ...grpc.CallOption,
+	) (grpc.ClientStream, error) {
+		log.Printf("--> stream interceptor: %s", method)
+
+		return streamer(ctx, desc, cc, method, opts...)
+	}
 }

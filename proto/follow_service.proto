@@ -4,6 +4,18 @@ package v1;
 
 option go_package = ".;pb";
 
+import "follow_message.proto";
+
+message RequestListFollow{
+    FollowListType follow_type = 1;
+    int64 follower = 2;
+    int64 followee = 3;
+}
+
+message ResponseListFollow{
+    repeated Follow Follows = 1;
+}
+
 message RequestFollow{
     int64 followee = 1;
 }
@@ -13,4 +25,6 @@ message ResponseFollow{}
 service FollowService{
     // ToggleFollow 
     rpc ToggleFollow(RequestFollow) returns (ResponseFollow);
+    // List
+    rpc ListFollow(RequestListFollow) returns (ResponseListFollow);
 }

@@ -1,4 +1,4 @@
-package tweet
+package eventstore
 
 import (
 	"context"
@@ -8,8 +8,10 @@ import (
 
 // EventStore interface
 type EventStore interface {
+	// Start event store.
+	Start() error
 	// Publish to event store
-	Publish(ctx context.Context, n *pb.NewNotification) error
+	Publish(ctx context.Context, n *pb.TweetEvent) error
 	// Close event store connection.
 	Close() error
 }

@@ -25,3 +25,15 @@ CREATE TABLE follows(
     FOREIGN KEY (followee) REFERENCES users (id),
     FOREIGN KEY (follower) REFERENCES users (id)
 );
+
+CREATE TABLE notifications(
+    id SERIAL PRIMARY KEY,
+    user_origin INTEGER NOT NULL,
+    type VARCHAR NOT NULL,
+    type_id INTEGER NOT NULL,
+    title VARCHAR NOT NULL,
+    user_id INTEGER NOT NULL,
+    opened BOOLEAN NOT NULL,
+    FOREIGN KEY (user_origin) REFERENCES users (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);

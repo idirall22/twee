@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = ".;pb";
+
+enum Type{
+    UNKNOWNE_TYPE = 0;
+    TWEET = 1;
+    FOLLOW = 2;
+}

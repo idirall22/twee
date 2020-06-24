@@ -7,4 +7,5 @@ type UserClaims struct {
 	jwt.StandardClaims
 	ID       int64
 	Username string
+	Token    string
 }

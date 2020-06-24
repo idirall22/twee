@@ -29,6 +29,116 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+type RequestListFollow struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	FollowType FollowListType `protobuf:"varint,1,opt,name=follow_type,json=followType,proto3,enum=v1.FollowListType" json:"follow_type,omitempty"`
+	Follower   int64          `protobuf:"varint,2,opt,name=follower,proto3" json:"follower,omitempty"`
+	Followee   int64          `protobuf:"varint,3,opt,name=followee,proto3" json:"followee,omitempty"`
+}
+
+func (x *RequestListFollow) Reset() {
+	*x = RequestListFollow{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_follow_service_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RequestListFollow) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestListFollow) ProtoMessage() {}
+
+func (x *RequestListFollow) ProtoReflect() protoreflect.Message {
+	mi := &file_follow_service_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestListFollow.ProtoReflect.Descriptor instead.
+func (*RequestListFollow) Descriptor() ([]byte, []int) {
+	return file_follow_service_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *RequestListFollow) GetFollowType() FollowListType {
+	if x != nil {
+		return x.FollowType
+	}
+	return FollowListType_FOLLOWER
+}
+
+func (x *RequestListFollow) GetFollower() int64 {
+	if x != nil {
+		return x.Follower
+	}
+	return 0
+}
+
+func (x *RequestListFollow) GetFollowee() int64 {
+	if x != nil {
+		return x.Followee
+	}
+	return 0
+}
+
+type ResponseListFollow struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Follows []*Follow `protobuf:"bytes,1,rep,name=Follows,proto3" json:"Follows,omitempty"`
+}
+
+func (x *ResponseListFollow) Reset() {
+	*x = ResponseListFollow{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_follow_service_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ResponseListFollow) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResponseListFollow) ProtoMessage() {}
+
+func (x *ResponseListFollow) ProtoReflect() protoreflect.Message {
+	mi := &file_follow_service_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResponseListFollow.ProtoReflect.Descriptor instead.
+func (*ResponseListFollow) Descriptor() ([]byte, []int) {
+	return file_follow_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ResponseListFollow) GetFollows() []*Follow {
+	if x != nil {
+		return x.Follows
+	}
+	return nil
+}
+
 type RequestFollow struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -40,7 +150,7 @@ type RequestFollow struct {
 func (x *RequestFollow) Reset() {
 	*x = RequestFollow{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_follow_service_proto_msgTypes[0]
+		mi := &file_follow_service_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -53,7 +163,7 @@ func (x *RequestFollow) String() string {
 func (*RequestFollow) ProtoMessage() {}
 
 func (x *RequestFollow) ProtoReflect() protoreflect.Message {
-	mi := &file_follow_service_proto_msgTypes[0]
+	mi := &file_follow_service_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -66,7 +176,7 @@ func (x *RequestFollow) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestFollow.ProtoReflect.Descriptor instead.
 func (*RequestFollow) Descriptor() ([]byte, []int) {
-	return file_follow_service_proto_rawDescGZIP(), []int{0}
+	return file_follow_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *RequestFollow) GetFollowee() int64 {
@@ -85,7 +195,7 @@ type ResponseFollow struct {
 func (x *ResponseFollow) Reset() {
 	*x = ResponseFollow{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_follow_service_proto_msgTypes[1]
+		mi := &file_follow_service_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -98,7 +208,7 @@ func (x *ResponseFollow) String() string {
 func (*ResponseFollow) ProtoMessage() {}
 
 func (x *ResponseFollow) ProtoReflect() protoreflect.Message {
-	mi := &file_follow_service_proto_msgTypes[1]
+	mi := &file_follow_service_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -111,24 +221,41 @@ func (x *ResponseFollow) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseFollow.ProtoReflect.Descriptor instead.
 func (*ResponseFollow) Descriptor() ([]byte, []int) {
-	return file_follow_service_proto_rawDescGZIP(), []int{1}
+	return file_follow_service_proto_rawDescGZIP(), []int{3}
 }
 
 var File_follow_service_proto protoreflect.FileDescriptor
 
 var file_follow_service_proto_rawDesc = []byte{
 	0x0a, 0x14, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x02, 0x76, 0x31, 0x22, 0x2b, 0x0a, 0x0d, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x1a, 0x0a, 0x08, 0x66,
-	0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x66,
-	0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x22, 0x10, 0x0a, 0x0e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x32, 0x46, 0x0a, 0x0d, 0x46, 0x6f, 0x6c,
-	0x6c, 0x6f, 0x77, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x35, 0x0a, 0x0c, 0x54, 0x6f,
-	0x67, 0x67, 0x6c, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x11, 0x2e, 0x76, 0x31, 0x2e,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x1a, 0x12, 0x2e,
-	0x76, 0x31, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f,
-	0x77, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x02, 0x76, 0x31, 0x1a, 0x14, 0x66, 0x6f, 0x6c, 0x6c,
+	0x6f, 0x77, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x22, 0x80, 0x01, 0x0a, 0x11, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x4c, 0x69, 0x73, 0x74,
+	0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x33, 0x0a, 0x0b, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77,
+	0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x12, 0x2e, 0x76, 0x31,
+	0x2e, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x79, 0x70, 0x65, 0x52,
+	0x0a, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x66,
+	0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x66,
+	0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f,
+	0x77, 0x65, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f,
+	0x77, 0x65, 0x65, 0x22, 0x3a, 0x0a, 0x12, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x4c,
+	0x69, 0x73, 0x74, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x24, 0x0a, 0x07, 0x46, 0x6f, 0x6c,
+	0x6c, 0x6f, 0x77, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x76, 0x31, 0x2e,
+	0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x52, 0x07, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x73, 0x22,
+	0x2b, 0x0a, 0x0d, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77,
+	0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x65, 0x22, 0x10, 0x0a, 0x0e,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x32, 0x83,
+	0x01, 0x0a, 0x0d, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x12, 0x35, 0x0a, 0x0c, 0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77,
+	0x12, 0x11, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x46, 0x6f, 0x6c,
+	0x6c, 0x6f, 0x77, 0x1a, 0x12, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x3b, 0x0a, 0x0a, 0x4c, 0x69, 0x73, 0x74, 0x46,
+	0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x12, 0x15, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x1a, 0x16, 0x2e, 0x76,
+	0x31, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x6f,
+	0x6c, 0x6c, 0x6f, 0x77, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x3b, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -143,19 +270,27 @@ func file_follow_service_proto_rawDescGZIP() []byte {
 	return file_follow_service_proto_rawDescData
 }
 
-var file_follow_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_follow_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_follow_service_proto_goTypes = []interface{}{
-	(*RequestFollow)(nil),  // 0: v1.RequestFollow
-	(*ResponseFollow)(nil), // 1: v1.ResponseFollow
+	(*RequestListFollow)(nil),  // 0: v1.RequestListFollow
+	(*ResponseListFollow)(nil), // 1: v1.ResponseListFollow
+	(*RequestFollow)(nil),      // 2: v1.RequestFollow
+	(*ResponseFollow)(nil),     // 3: v1.ResponseFollow
+	(FollowListType)(0),        // 4: v1.FollowListType
+	(*Follow)(nil),             // 5: v1.Follow
 }
 var file_follow_service_proto_depIdxs = []int32{
-	0, // 0: v1.FollowService.ToggleFollow:input_type -> v1.RequestFollow
-	1, // 1: v1.FollowService.ToggleFollow:output_type -> v1.ResponseFollow
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: v1.RequestListFollow.follow_type:type_name -> v1.FollowListType
+	5, // 1: v1.ResponseListFollow.Follows:type_name -> v1.Follow
+	2, // 2: v1.FollowService.ToggleFollow:input_type -> v1.RequestFollow
+	0, // 3: v1.FollowService.ListFollow:input_type -> v1.RequestListFollow
+	3, // 4: v1.FollowService.ToggleFollow:output_type -> v1.ResponseFollow
+	1, // 5: v1.FollowService.ListFollow:output_type -> v1.ResponseListFollow
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_follow_service_proto_init() }
@@ -163,9 +298,10 @@ func file_follow_service_proto_init() {
 	if File_follow_service_proto != nil {
 		return
 	}
+	file_follow_message_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_follow_service_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RequestFollow); i {
+			switch v := v.(*RequestListFollow); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -177,6 +313,30 @@ func file_follow_service_proto_init() {
 			}
 		}
 		file_follow_service_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResponseListFollow); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_follow_service_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RequestFollow); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_follow_service_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ResponseFollow); i {
 			case 0:
 				return &v.state
@@ -195,7 +355,7 @@ func file_follow_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_follow_service_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -223,6 +383,8 @@ const _ = grpc.SupportPackageIsVersion6
 type FollowServiceClient interface {
 	// ToggleFollow
 	ToggleFollow(ctx context.Context, in *RequestFollow, opts ...grpc.CallOption) (*ResponseFollow, error)
+	// List
+	ListFollow(ctx context.Context, in *RequestListFollow, opts ...grpc.CallOption) (*ResponseListFollow, error)
 }
 
 type followServiceClient struct {
@@ -242,10 +404,21 @@ func (c *followServiceClient) ToggleFollow(ctx context.Context, in *RequestFollo
 	return out, nil
 }
 
+func (c *followServiceClient) ListFollow(ctx context.Context, in *RequestListFollow, opts ...grpc.CallOption) (*ResponseListFollow, error) {
+	out := new(ResponseListFollow)
+	err := c.cc.Invoke(ctx, "/v1.FollowService/ListFollow", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FollowServiceServer is the server API for FollowService service.
 type FollowServiceServer interface {
 	// ToggleFollow
 	ToggleFollow(context.Context, *RequestFollow) (*ResponseFollow, error)
+	// List
+	ListFollow(context.Context, *RequestListFollow) (*ResponseListFollow, error)
 }
 
 // UnimplementedFollowServiceServer can be embedded to have forward compatible implementations.
@@ -254,6 +427,9 @@ type UnimplementedFollowServiceServer struct {
 
 func (*UnimplementedFollowServiceServer) ToggleFollow(context.Context, *RequestFollow) (*ResponseFollow, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToggleFollow not implemented")
+}
+func (*UnimplementedFollowServiceServer) ListFollow(context.Context, *RequestListFollow) (*ResponseListFollow, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFollow not implemented")
 }
 
 func RegisterFollowServiceServer(s *grpc.Server, srv FollowServiceServer) {
@@ -278,6 +454,24 @@ func _FollowService_ToggleFollow_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FollowService_ListFollow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RequestListFollow)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FollowServiceServer).ListFollow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.FollowService/ListFollow",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FollowServiceServer).ListFollow(ctx, req.(*RequestListFollow))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _FollowService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "v1.FollowService",
 	HandlerType: (*FollowServiceServer)(nil),
@@ -285,6 +479,10 @@ var _FollowService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ToggleFollow",
 			Handler:    _FollowService_ToggleFollow_Handler,
+		},
+		{
+			MethodName: "ListFollow",
+			Handler:    _FollowService_ListFollow_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
