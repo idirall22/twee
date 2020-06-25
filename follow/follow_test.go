@@ -63,16 +63,23 @@ func TestFollow(t *testing.T) {
 	token := resLogin.AccessToken
 	ctx = metadata.AppendToOutgoingContext(ctx, auth.AuthKey, token)
 
+	userClaims1, err := jwtManager.Verify(resLogin.AccessToken)
+	require.NoError(t, err)
+	require.NotNil(t, userClaims1)
+
 	userClaims, err := jwtManager.Verify(resLogin2.AccessToken)
 	require.NoError(t, err)
 	require.NotNil(t, userClaims)
 
-	resFollow, err := followClient.ToggleFollow(ctx, &pb.RequestFollow{Followee: userClaims.ID})
+	resFollow, err := followClient.ToggleFollow(
+		ctx,
+		&pb.RequestFollow{Followee: userClaims1.ID},
+	)
 	require.NoError(t, err)
 	require.NotNil(t, resFollow)
 
 	resListFollow, err := followClient.ListFollow(ctx, &pb.RequestListFollow{
-		Followee:   userClaims.ID,
+		Followee:   userClaims1.ID,
 		FollowType: pb.FollowListType_FOLLOWEE,
 	})
 	require.NoError(t, err)

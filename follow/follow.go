@@ -68,8 +68,8 @@ func (s *Server) ToggleFollow(ctx context.Context, req *pb.RequestFollow) (*pb.R
 func (s *Server) ListFollow(ctx context.Context, req *pb.RequestListFollow) (*pb.ResponseListFollow, error) {
 	followsList, err := s.followStore.ListFollow(
 		ctx,
-		req.Followee,
 		req.Follower,
+		req.Followee,
 		req.FollowType,
 	)
 	if err != nil {
