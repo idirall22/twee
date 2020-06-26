@@ -1,35 +1,59 @@
 package notification
 
 import (
+	"errors"
 	"fmt"
 
-	neventstore "github.com/idirall22/twee/notification/event_store/stan"
+	"github.com/idirall22/twee/follow"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	notifeventstore "github.com/idirall22/twee/notification/event_store"
+	"github.com/idirall22/twee/notification/store"
 	"github.com/idirall22/twee/pb"
-
-	option "github.com/idirall22/twee/options"
 )
 
 // Server notification service server.
 type Server struct {
-	eventStore  EventStore
+	running     bool
+	store       store.Store
+	eventStore  notifeventstore.EventStore
 	connections map[int64]*pb.NotificationService_NotifyServer
 }
 
 // NewNotificationServer create notification server service
-func NewNotificationServer(opts *option.PostgresOptions) (*Server, error) {
-	es, err := neventstore.NewNatsStreamingEventStore("tweets", opts)
-	if err != nil {
-		return nil, fmt.Errorf("Could not connect to event store: %v", err)
+func NewNotificationServer(
+	ns store.Store,
+	es notifeventstore.EventStore,
+	fs *follow.Server,
+) (*Server, error) {
+	if ns == nil {
+		return nil, errors.New("Notification store should not be nil")
 	}
-	go es.Start()
+
+	if es == nil {
+		return nil, errors.New("Notification event store should not be nil")
+	}
+
+	if fs == nil {
+		return nil, errors.New("Follow service should not be nil")
+	}
 
 	return &Server{
+		store:       ns,
 		eventStore:  es,
 		connections: make(map[int64]*pb.NotificationService_NotifyServer, 128),
 	}, nil
+}
+
+// Start notification service
+func (s *Server) Start() error {
+	if !s.running {
+		s.running = true
+		return s.eventStore.Start()
+	}
+	return errors.New("Serivce already started")
 }
 
 // Notify client

@@ -30,3 +30,6 @@ test-tweet:
 test-notification:
 	go clean -testcache
 	cd notification/ && go test -v ./...	
+
+client:
+	go run cmd/main.go

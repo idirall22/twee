@@ -4,17 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	eventstore "github.com/idirall22/twee/tweet/event_store"
-	"github.com/idirall22/twee/tweet/store"
-
-	"github.com/idirall22/twee/auth"
-
 	// postgres driver
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/idirall22/twee/auth"
 	"github.com/idirall22/twee/pb"
+	eventstore "github.com/idirall22/twee/tweet/event_store"
+	"github.com/idirall22/twee/tweet/store"
 )
 
 // Server server
@@ -30,11 +28,11 @@ func NewTweetServer(s store.Store, es eventstore.EventStore) (*Server, error) {
 		return nil, fmt.Errorf("Store should not be NIL")
 	}
 
-	// if es == nil {
-	// 	return nil, fmt.Errorf("Event Store should not be NIL")
-	// }
+	if es == nil {
+		return nil, fmt.Errorf("Event Store should not be NIL")
+	}
 
-	// go es.Start()
+	go es.Start()
 
 	return &Server{
 		tweetStore: s,
@@ -56,7 +54,7 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateTweetRequest) (*pb.Cr
 	}
 
 	userID := userInfos.ID
-	// username := userInfos.Username
+	username := userInfos.Username
 
 	id, err := s.tweetStore.Create(ctx, userID, content)
 	if err != nil {
@@ -67,16 +65,16 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateTweetRequest) (*pb.Cr
 		Id: id,
 	}
 
-	// e := &pb.TweetEvent{
-	// 	Action:  pb.Action_CREATED,
-	// 	Title:   fmt.Sprintf("%s has just tweeted", username),
-	// 	TweetId: id,
-	// 	UserId:  userID,
-	// }
+	e := &pb.TweetEvent{
+		Action:  pb.Action_CREATED,
+		Title:   fmt.Sprintf("%s has just tweeted", username),
+		TweetId: id,
+		UserId:  userID,
+	}
 
-	// go func() {
-	// 	s.eventStore.Publish(ctx, e)
-	// }()
+	go func() {
+		s.eventStore.Publish(ctx, e)
+	}()
 
 	return res, nil
 }

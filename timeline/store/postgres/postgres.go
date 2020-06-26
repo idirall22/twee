@@ -49,13 +49,11 @@ func (s *PostgresTimelineStore) List(
 
 	defer tx.Rollback()
 
-	usersString := "{" + strconv.FormatInt(userID, 10)
+	usersString := strconv.FormatInt(userID, 10)
 	query := "SELECT * FROM tweets WHERE user_id = ANY($1::int[])"
-	if timelineType == pb.TimelineType_HOME {
-		usersString = getFolloweeString(usersString, followList)
-	}
-
-	usersString += "}"
+	usersString = common.GetFolloweeString(usersString, followList)
+	// if timelineType == pb.TimelineType_HOME {
+	// }
 
 	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
