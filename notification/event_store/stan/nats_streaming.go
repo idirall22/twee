@@ -55,45 +55,40 @@ func (e *NatsStreamingEventStore) Start() error {
 
 	go func() {
 		for {
-			select {
-			case <-e.done:
-				log.Println("Done")
+			msg := <-e.tweetNotifications
+			tn := &pb.TweetEvent{}
+			err := common.JSONToProtobufMessage(msg, tn)
+			if err != nil {
+				log.Println("----------------Error JSON")
+				e.done <- fmt.Errorf("Could not parse json: %v", err)
 				return
-			case msg := <-e.tweetNotifications:
-				tn := &pb.TweetEvent{}
-				err := common.JSONToProtobufMessage(msg, tn)
-				if err != nil {
-					log.Println("----------------Error JSON")
-					e.done <- fmt.Errorf("Could not parse json: %v", err)
-					return
-				}
+			}
 
-				var followersList []*pb.Follow
-				// ctx := metadata.AppendToOutgoingContext(context.Background(), auth.AuthKey, uc.Token)
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-				defer cancel()
-				res, err := e.followService.ListFollow(ctx, &pb.RequestListFollow{
-					FollowType: pb.FollowListType_FOLLOWEE,
-					Followee:   tn.UserId,
-				})
+			var followersList []*pb.Follow
+			// ctx := metadata.AppendToOutgoingContext(context.Background(), auth.AuthKey, uc.Token)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+			defer cancel()
+			res, err := e.followService.ListFollow(ctx, &pb.RequestListFollow{
+				FollowType: pb.FollowListType_FOLLOWEE,
+				Followee:   tn.UserId,
+			})
 
-				if err != nil {
-					log.Println("----------------Error ListFollows", err.Error())
-					e.done <- fmt.Errorf("Could not list followers: %v", err)
-					return
-				}
+			if err != nil {
+				log.Println("----------------Error ListFollows", err.Error())
+				e.done <- fmt.Errorf("Could not list followers: %v", err)
+				break
+			}
 
-				followersList = res.Follows
+			followersList = res.Follows
 
-				if len(followersList) == 0 {
-					log.Println("User have no followers yet")
-					continue
-				}
-				err = e.notificationStore.NewTweetNotification(ctx, followersList, tn, e.notifications)
-				if err != nil {
-					e.done <- fmt.Errorf("Could not create notifications: %v", err)
-					return
-				}
+			if len(followersList) == 0 {
+				log.Println("User have no followers yet")
+				continue
+			}
+			err = e.notificationStore.NewTweetNotification(ctx, followersList, tn, e.notifications)
+			if err != nil {
+				e.done <- fmt.Errorf("Could not create notifications: %v", err)
+				break
 			}
 		}
 	}()

@@ -6,6 +6,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/idirall22/twee/auth/store"
+
 	// postgres driver
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -24,7 +26,7 @@ var (
 
 // Server auth server struct
 type Server struct {
-	authStore  *apstore.PostgresAuthStore
+	authStore  store.Store
 	jwtManager *JwtManager
 }
 
